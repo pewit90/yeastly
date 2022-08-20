@@ -1,0 +1,31 @@
+{
+    "id": "A test bread",
+    "steps": [
+        {
+            "shortName": "Poolish",
+            "completed": true,
+            "trigger": {
+                "startTime": "2022-08-20T09:55:39.789Z",
+                "endTime": "2022-08-20T11:55:39.789Z",
+                "durationSeconds": 10800
+            }
+        },
+        {
+            "shortName": "Fermenting",
+            "completed": false,
+            "trigger": {
+                "startTime": "2022-08-20T11:55:39.789Z",
+                "endTime": null,
+                "eventName": "Dough doubled in size"
+            }
+        },
+        {
+            "shortName": "Move to panettone",
+            "completed": false
+        },
+        {
+            "shortName": "Bake at 175",
+            "completed": false
+        }
+    ]
+}
