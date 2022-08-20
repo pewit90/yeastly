@@ -19,7 +19,8 @@ export interface Step {
 }
 
 export interface Bread {
-    id: string;
+    uuid: number;
+    name: string;
     steps: Step[];
     
 }

@@ -1,5 +1,6 @@
 {
-    "id": "A test bread",
+    "uuid": 1,
+    "name": "A test bread",
     "steps": [
         {
             "shortName": "Poolish",
