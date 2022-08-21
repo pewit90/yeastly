@@ -1,0 +1,26 @@
+{
+    "uuid": 2,
+    "name": "Another test bread",
+    "steps": [
+        {
+            "name": "Poolish",
+            "completed": true,
+            "autostart": false
+        },
+        {
+            "name": "Fermenting",
+            "completed": false,
+            "autostart": true
+        },
+        {
+            "name": "Move to panettone",
+            "autostart": false,
+            "completed": false
+        },
+        {
+            "name": "Bake at 175",
+            "autostart": false,
+            "completed": false
+        }
+    ]
+}
