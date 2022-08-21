@@ -2,42 +2,42 @@ import React from 'react';
 import './App.css';
 import Button from '@mui/material/Button';
 import { Step, toBread } from '../model/bread';
-import { Card, CardActions, CardContent, Stack, Typography } from '@mui/material';
+import { Card, CardActions, CardContent, Stack, Typography, Collapse } from '@mui/material';
 import TestBread from '../testing/input/bread1.json'
 
 const testBread = toBread(TestBread);
 
-function StepBox(props: {step: Step}) {
+function StepBoxItem(props: { title: string, value: string }) {
+  return <Typography color='text.secondary' >
+    <div style={{ display: "flex" }}>
+      <div style={{ textAlign: "left" }}>{props.title}</div>
+      <div style={{ textAlign: "right", flex: 1 }} >{props.value}</div>
+    </div>
+  </Typography>
+}
 
-  const card = <Card sx={{ minWidth: 275 }}>
+function StepBox(props: { step: Step }) {
+  return <Card sx={{ minWidth: 275 }}>
     <CardContent>
-      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+      <Typography gutterBottom variant="h5" component="div">
         {props.step.name}
       </Typography>
-      <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        {props.step.trigger?.startTime?.toString()}
-      </Typography>
-      <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        {props.step.trigger?.endTime?.toString()}
-      </Typography>
-      <Typography variant="body2">
-        {props.step.completed.toString()}
-      </Typography>
+      <StepBoxItem title={'Start Time'} value={props.step.trigger?.startTime?.toLocaleTimeString() ?? ''} />
+      <StepBoxItem title={'End Time'} value={props.step.trigger?.endTime?.toLocaleTimeString() ?? ''} />
+      <StepBoxItem title={'Completed'} value={props.step.completed.toString()} />
     </CardContent>
     <CardActions>
-      <Button size="small">Complete</Button>
+      <Button hidden={props.step.completed} size="small">Complete</Button>
     </CardActions>
   </Card>
-  return card;
 }
 
 function StepsList(props: { steps: Step[] }) {
-  const stepBoxList = props.steps.map(el => StepBox({step: el as Step}));
+  const stepBoxList = props.steps.map(el => StepBox({ step: el as Step }));
   return <Stack spacing={2}>
     {stepBoxList}
   </Stack>
 }
-
 
 function App() {
   const steps = testBread.steps;
