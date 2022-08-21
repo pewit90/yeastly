@@ -2,8 +2,11 @@ import React from 'react';
 import './App.css';
 import Button from '@mui/material/Button';
 import { Step, toBread } from '../model/bread';
-import { Card, CardActions, CardContent, Stack, Typography, Collapse } from '@mui/material';
+import { AppBar, Card, CardActions, CardContent, IconButton, Paper, Stack, Toolbar, Typography } from '@mui/material';
+import { Box, Container } from '@mui/system';
+import MenuIcon from '@mui/icons-material/Menu';
 import TestBread from '../testing/input/bread1.json'
+
 
 const testBread = toBread(TestBread);
 
@@ -44,7 +47,32 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <StepsList steps={steps} />
+        <Container maxWidth={'sm'}>
+          <Box sx={{ flexGrow: 1 }}>
+            <AppBar position="static">
+              <Toolbar>
+                <IconButton
+                  size="large"
+                  edge="start"
+                  color="inherit"
+                  aria-label="menu"
+                  sx={{ mr: 2 }}
+                  onClick={()=> alert('not implemented')}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" component="div" align='left' sx={{ flexGrow: 1 }}>
+                  {testBread.name}
+                </Typography>
+              </Toolbar>
+            </AppBar>
+          </Box>
+          <Paper elevation={3}>
+            <Container maxWidth={'xs'}>
+              <StepsList steps={steps} />
+            </Container>
+          </Paper>
+        </Container>
       </header>
     </div>
   );
