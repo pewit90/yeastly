@@ -10,11 +10,14 @@ interface TimerTrigger extends Trigger {
 
 interface EventTrigger extends Trigger {
     eventName: string; // e.g. when dough has doubled in size
+    reminderPeriodSeconds: number;
 }
 
 export interface Step {
-    shortName: string;
+    name: string;
     completed: boolean;
+    // Does this step start automatically when active?
+    autostart: boolean;
     trigger?: Trigger;
 }
 
