@@ -1,9 +1,11 @@
 import React from 'react';
 import './App.css';
 import Button from '@mui/material/Button';
-import { Step } from '../model/bread';
+import { Step, toBread } from '../model/bread';
 import { Card, CardActions, CardContent, Stack, Typography } from '@mui/material';
-import TestBread from '../testing/input/bread2.json'
+import TestBread from '../testing/input/bread1.json'
+
+const testBread = toBread(TestBread);
 
 function StepBox(props: {step: Step}) {
 
@@ -12,12 +14,12 @@ function StepBox(props: {step: Step}) {
       <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
         {props.step.name}
       </Typography>
-      {/* <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        {props.step.trigger?.startTime}
+      <Typography sx={{ mb: 1.5 }} color="text.secondary">
+        {props.step.trigger?.startTime?.toString()}
       </Typography>
       <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        {props.step.trigger?.endTime}
-      </Typography> */}
+        {props.step.trigger?.endTime?.toString()}
+      </Typography>
       <Typography variant="body2">
         {props.step.completed.toString()}
       </Typography>
@@ -38,7 +40,7 @@ function StepsList(props: { steps: Step[] }) {
 
 
 function App() {
-  const steps = TestBread.steps;
+  const steps = testBread.steps;
   return (
     <div className="App">
       <header className="App-header">
