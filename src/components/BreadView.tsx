@@ -1,6 +1,8 @@
 import { AppBar, Box, Button, Card, CardActions, CardContent, Container, IconButton, Paper, Stack, Toolbar, Typography } from "@mui/material";
-import { Bread, Step } from "../model/bread";
+import { Step } from "../model/bread";
 import MenuIcon from '@mui/icons-material/Menu';
+import { useParams } from "react-router-dom";
+import { getBread } from "../model/store";
 
 function StepBoxItem(props: { title: string, value: string }) {
     return <Typography color='text.secondary' >
@@ -34,7 +36,11 @@ function StepsList(props: { steps: Step[] }) {
     </Stack>
 }
 
-export function BreadView(props: { bread: Bread }) {
+export function BreadView() {
+    const params = useParams();
+    const uuid = Number(params.uuid!);
+    const bread = getBread(uuid);
+
     return <Container maxWidth={'sm'}>
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -50,14 +56,14 @@ export function BreadView(props: { bread: Bread }) {
                         <MenuIcon/>
                     </IconButton>
                     <Typography variant="h6" component="div" align='left' sx={{ flexGrow: 1 }}>
-                        {props.bread.name}
+                        {bread.name}
                     </Typography>
                 </Toolbar>
             </AppBar>
         </Box>
         <Paper elevation={3}>
             <Container maxWidth={'xs'}>
-                <StepsList steps={props.bread.steps} />
+                <StepsList steps={bread.steps} />
             </Container>
         </Paper>
     </Container>
