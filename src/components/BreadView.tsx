@@ -24,7 +24,7 @@ function StepBox(props: { step: Step }) {
             <StepBoxItem title={'Completed'} value={props.step.completed.toString()} />
         </CardContent>
         <CardActions>
-            <Button hidden={props.step.completed} size="small">Complete</Button>
+            { props.step.completed || <Button size="small">Complete</Button> }
         </CardActions>
     </Card>
 }

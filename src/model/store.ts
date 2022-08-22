@@ -2,15 +2,34 @@ import { Bread, toBread } from "./bread";
 import bread1JSON from '../testing/input/bread1.json';
 import bread2JSON from '../testing/input/bread2.json';
 
-const bread1 = toBread(bread1JSON);
-const bread2 = toBread(bread2JSON);
+const BREADS = "breads";
 
-const breads: Record<number, Bread> = {
-    [bread1.uuid]: bread1,
-    [bread2.uuid]: bread2,
+function readStorage(): Bread[] {
+    const storageValue = localStorage.getItem(BREADS);
+    if (storageValue) {
+        const breadUuids = JSON.parse(storageValue) as number[];
+        return breadUuids.map(uuid => toBread(JSON.parse(localStorage.getItem(uuid.toString())!)));
+    } else {
+        // TODO initialize with proper default values
+        const bread1 = toBread(bread1JSON);
+        const bread2 = toBread(bread2JSON);
+        const breads = [bread1, bread2];
+        localStorage.setItem(BREADS, JSON.stringify([bread1.uuid, bread2.uuid]));
+        breads.forEach(bread => localStorage.setItem(bread.uuid.toString(), JSON.stringify(bread)));
+        return breads;
+    }
 }
+
+const breadIndex: Record<number, Bread> = readStorage().reduce(
+    (acc, current) => ({ ...acc, [current.uuid]: current }),
+    {} as Record<number, Bread>
+);
 
 export function getBread(uuid: number): Bread {
-    return breads[uuid];
+    return breadIndex[uuid];
 }
 
+export function updateBread(bread: Bread) {
+    localStorage.setItem(bread.uuid.toString(), JSON.stringify(bread));
+    breadIndex[bread.uuid] = bread;
+}
