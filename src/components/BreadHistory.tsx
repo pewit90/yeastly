@@ -4,7 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 
 function BreadListItem(props: { bread: Bread}) {
-    return <ListItem>
+    return <ListItem key={props.bread.uuid}>
         <ListItemText primary={props.bread.name} secondary={props.bread.createdTimestamp.toLocaleDateString()}/>
     </ListItem>
 }
