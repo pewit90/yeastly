@@ -1,6 +1,7 @@
 {
     "uuid": 1,
     "name": "A test bread",
+    "createdTimestamp": "2022-08-20T09:30:00.000Z",
     "steps": [
         {
             "name": "Poolish",

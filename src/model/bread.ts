@@ -1,4 +1,9 @@
 
+function toDateOrUndefined(isoDate: string | undefined) {
+    const date = isoDate ? new Date(isoDate) : undefined;
+    return date;
+}
+
 function getTriggerFunction(obj: any): Function {
     if (obj.durationSeconds !== undefined)
         return toTimerTrigger;
@@ -10,8 +15,8 @@ function getTriggerFunction(obj: any): Function {
 
 function toTrigger(obj: any): Trigger {
     return {
-        startTime: obj.startTime ? new Date(obj.startTime) : undefined,
-        endTime: obj.endTime ? new Date(obj.endTime) : undefined
+        startTime: toDateOrUndefined(obj.startTime),
+        endTime: toDateOrUndefined(obj.endTime)
     }
 }
 
@@ -71,7 +76,10 @@ export function toBread(obj: any): Bread {
     return {
         uuid: obj.uuid as number,
         name: obj.name,
-        steps: obj.steps? obj.steps.map((el:any) => toStep(el)):[]
+        steps: obj.steps ? obj.steps.map((el: any) => toStep(el)) : [],
+        started: obj.started,
+        createdTimestamp: toDateOrUndefined(obj.createdTimestamp) ?? new Date(), // set now if created time not set
+        completedTimestamp: toDateOrUndefined(obj.completedTimestamp)
     }
 }
 
@@ -79,4 +87,7 @@ export interface Bread {
     uuid: number;
     name: string;
     steps: Step[];
+    started: boolean;
+    createdTimestamp: Date;
+    completedTimestamp?: Date;
 }

@@ -1,21 +1,19 @@
-import { AppBar, Box, Container, IconButton, Paper, Stack, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Container, IconButton, List, ListItem, ListItemText, Toolbar, Typography } from "@mui/material";
 import { Bread } from "../model/bread";
 import MenuIcon from '@mui/icons-material/Menu';
 
 
-function BreadListItem(props: { bread: Bread }) {
-    return <Paper>
-        <Typography>
-            {props.bread.name}
-        </Typography>
-    </Paper>
+function BreadListItem(props: { bread: Bread}) {
+    return <ListItem>
+        <ListItemText primary={props.bread.name} secondary={props.bread.createdTimestamp.toLocaleDateString()}/>
+    </ListItem>
 }
 
 function BreadList(props: { breads: Bread[] }) {
     const items = props.breads.map(el => BreadListItem({ bread: el as Bread }));
-    return <Stack>
+    return <List>   
         {items}
-    </Stack>
+    </List>
 }
 
 export function BreadHistory(props: { breads: Bread[] }) {
