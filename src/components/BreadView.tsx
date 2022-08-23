@@ -1,7 +1,7 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button, Card, CardActions, CardContent, IconButton, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { Step } from "../model/bread";
+import { Step } from "../model/step";
 import { getBread } from "../model/store";
 import { Page } from './Page';
 
@@ -22,9 +22,9 @@ function StepBox(props: { step: Step }) {
             <Typography gutterBottom variant="h6" component="div">
                 {props.step.name}
             </Typography>
-            <StepBoxItem title={'Start Time'} value={props.step.trigger?.startTime?.toLocaleTimeString() ?? ''} />
-            <StepBoxItem title={'End Time'} value={props.step.trigger?.endTime?.toLocaleTimeString() ?? ''} />
-            <StepBoxItem title={'Completed'} value={props.step.completed.toString()} />
+            <StepBoxItem title="Start Time" value={props.step.startedAt?.toLocaleTimeString() ?? ''} />
+            <StepBoxItem title="End Time" value={props.step.completedAt?.toLocaleTimeString() ?? ''} />
+            <StepBoxItem title="State" value={props.step.state} />
         </CardContent>
         <CardActions>
             {props.step.completed || <Button size="small">Complete</Button>}

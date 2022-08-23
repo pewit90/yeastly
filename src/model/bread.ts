@@ -1,93 +1,34 @@
+import { toDateOrUndefined } from "../utils/conversion-utils";
+import { Step, StepState } from "./step";
 
-function toDateOrUndefined(isoDate: string | undefined) {
-    const date = isoDate ? new Date(isoDate) : undefined;
-    return date;
-}
+export class Bread {
 
-function getTriggerFunction(obj: any): Function {
-    if (obj.durationSeconds !== undefined)
-        return toTimerTrigger;
-    else if (obj.eventName && obj.reminderPeriodSeconds)
-        return toEventTrigger;
-    else
-        return toTrigger;
-}
-
-function toTrigger(obj: any): Trigger {
-    return {
-        startTime: toDateOrUndefined(obj.startTime),
-        endTime: toDateOrUndefined(obj.endTime)
+    get started(): boolean {
+        return this.steps.some(s => s.state !== StepState.PENDING);
     }
-}
 
-interface Trigger {
-    startTime?: Date | undefined;
-    endTime?: Date | undefined;
-}
-
-function toTimerTrigger(obj: any): TimerTrigger {
-    const trigger = toTrigger(obj);
-    return {
-        ...trigger,
-        durationSeconds: obj.durationSeconds as number
+    get completed(): boolean {
+        return this.steps.every(s => s.state === StepState.COMPLETED);
     }
-}
-interface TimerTrigger extends Trigger {
-    durationSeconds: number;
-}
 
-function toEventTrigger(obj: any): EventTrigger {
-    const trigger = toTrigger(obj);
-    return {
-        ...trigger,
-        eventName: obj.eventName,
-        reminderPeriodSeconds: obj.reminderPeriodSeconds as number
+    get currentStepIndex(): number {
+        return this.steps.findIndex(s => s.state === StepState.PENDING)
     }
-}
 
-interface EventTrigger extends Trigger {
-    eventName: string; // e.g. when dough has doubled in size
-    reminderPeriodSeconds: number;
-}
+    constructor(
+        public readonly uuid: number,
+        public readonly name: string,
+        public readonly steps: Step[],
+        public readonly createdTimestamp: Date,
+    ) { }
 
-function toStep(obj: any) {
-    const step: Step = {
-        name: obj.name,
-        completed: obj.completed as boolean,
-        autostart: obj.autostart as boolean
-    };
-    if (obj.trigger) {
-        const triggerObj = obj.trigger;
-        const conversionFunc = getTriggerFunction(triggerObj);
-        step.trigger = conversionFunc(triggerObj);
+    static fromObject(obj: any): Bread {
+        return new Bread(
+             obj.uuid as number,
+             obj.name,
+             obj.steps ? obj.steps.map((el: any) => Step.fromObject(el)) : [],
+            toDateOrUndefined(obj.createdTimestamp) ?? new Date(), // TODO throw error if undefined
+        )
     }
-    return step;
-}
 
-export interface Step {
-    name: string;
-    completed: boolean;
-    // Does this step start automatically when active?
-    autostart: boolean;
-    trigger?: Trigger;
-}
-
-export function toBread(obj: any): Bread {
-    return {
-        uuid: obj.uuid as number,
-        name: obj.name,
-        steps: obj.steps ? obj.steps.map((el: any) => toStep(el)) : [],
-        started: obj.started,
-        createdTimestamp: toDateOrUndefined(obj.createdTimestamp) ?? new Date(), // set now if created time not set
-        completedTimestamp: toDateOrUndefined(obj.completedTimestamp)
-    }
-}
-
-export interface Bread {
-    uuid: number;
-    name: string;
-    steps: Step[];
-    started: boolean;
-    createdTimestamp: Date;
-    completedTimestamp?: Date;
 }
