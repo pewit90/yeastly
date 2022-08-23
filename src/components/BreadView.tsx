@@ -1,16 +1,19 @@
-import { AppBar, Box, Button, Card, CardActions, CardContent, Container, IconButton, Paper, Stack, Toolbar, Typography } from "@mui/material";
-import { Step } from "../model/bread";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { AppBar, Box, Button, Card, CardActions, CardContent, Container, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import { Step } from "../model/bread";
 import { getBread } from "../model/store";
+import { HeaderMenu } from './HeaderMenu';
 
 function StepBoxItem(props: { title: string, value: string }) {
-    return <Typography color='text.secondary' >
-        <div style={{ display: "flex" }}>
-            <div style={{ textAlign: "left" }}>{props.title}</div>
-            <div style={{ textAlign: "right", flex: 1 }} >{props.value}</div>
+    return <div style={{ display: "flex" }}>
+        <div style={{ textAlign: "left" }}>
+            <Typography color={'text.primary'}>{props.title}</Typography>
         </div>
-    </Typography>
+        <div style={{ textAlign: "right", flex: 1 }} >
+            <Typography color={'text.secondary'}>{props.value}</Typography>
+        </div>
+    </div>
 }
 
 function StepBox(props: { step: Step }) {
@@ -24,14 +27,14 @@ function StepBox(props: { step: Step }) {
             <StepBoxItem title={'Completed'} value={props.step.completed.toString()} />
         </CardContent>
         <CardActions>
-            { props.step.completed || <Button size="small">Complete</Button> }
+            {props.step.completed || <Button size="small">Complete</Button>}
         </CardActions>
     </Card>
 }
 
-function StepsList(props: { steps: Step[] }) {
+function StepBoxList(props: { steps: Step[] }) {
     const stepBoxList = props.steps.map(el => StepBox({ step: el as Step }));
-    return <Stack spacing={2}>
+    return <Stack spacing={1}>
         {stepBoxList}
     </Stack>
 }
@@ -42,30 +45,19 @@ export function BreadView() {
     const bread = getBread(uuid);
     const navigate = useNavigate();
 
-    return <Container maxWidth={'sm'}>
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="back"
-                        sx={{ mr: 2 }}
-                        onClick={() => navigate('/')}
-                    >
-                        <ArrowBackIcon/>
-                    </IconButton>
-                    <Typography variant="h6" component="div" align='left' sx={{ flexGrow: 1 }}>
-                        {bread.name}
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-        </Box>
-        <Paper elevation={3}>
-            <Container maxWidth={'xs'}>
-                <StepsList steps={bread.steps} />
-            </Container>
-        </Paper>
-    </Container>
+    const navigationIcon = <IconButton
+        size="large"
+        edge="start"
+        color="inherit"
+        aria-label="back"
+        sx={{ mr: 2 }}
+        onClick={() => navigate('/')}
+    >
+        <ArrowBackIcon />
+    </IconButton>;
+    const stepBoxList = <StepBoxList steps={bread.steps} />;
+
+    return <HeaderMenu title={bread.name} navigationIcon={navigationIcon} >
+        {stepBoxList}
+    </HeaderMenu>
 }

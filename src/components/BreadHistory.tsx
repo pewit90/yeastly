@@ -1,7 +1,7 @@
-import { AppBar, Box, Container, IconButton, List, ListItem, ListItemText, Toolbar, Typography } from "@mui/material";
-import { Bread } from "../model/bread";
-import MenuIcon from '@mui/icons-material/Menu';
+import { List, ListItem, ListItemText } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Bread } from "../model/bread";
+import { HeaderMenu } from "./HeaderMenu";
 
 
 function BreadListItem(props: { bread: Bread }) {
@@ -21,26 +21,10 @@ function BreadList(props: { breads: Bread[] }) {
 }
 
 export function BreadHistory(props: { breads: Bread[] }) {
-    return <Container maxWidth={'sm'}>
-        <Box sx={{ height: '100%' }}>
-            <AppBar position="static">
-                <Toolbar>
-                    {/* <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}
-                        onClick={() => alert('not implemented')}
-                    >
-                        <MenuIcon />
-                    </IconButton> */}
-                    <Typography variant="h6" component="div" align='left' sx={{ flexGrow: 1 }}>
-                        {"History"}
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-        </Box>
-        <BreadList breads={props.breads} />
-    </Container>
+
+    const breadList = <BreadList breads={props.breads} />;
+
+    return <HeaderMenu title="History">
+        {breadList}
+    </HeaderMenu>
 }
