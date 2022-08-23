@@ -1,10 +1,11 @@
 import { AppBar, Box, Container, Toolbar, Typography } from "@mui/material";
-import { ReactElement, ReactNode } from "react";
+import { ReactNode } from "react";
 
 
-export function HeaderMenu(props: {
+export function Page(props: {
     title: string,
-    navigationIcon?: ReactElement,
+    navigationIcon?: ReactNode,
+    fabButton?: ReactNode
     children: ReactNode
 }) {
     return <Container maxWidth={'sm'}>
@@ -14,6 +15,7 @@ export function HeaderMenu(props: {
                 <Typography variant="h6" component="div" align='left' sx={{ flexGrow: 1 }}>
                     {props.title}
                 </Typography>
+                {props.fabButton}
             </Toolbar>
         </AppBar>
         <Box >

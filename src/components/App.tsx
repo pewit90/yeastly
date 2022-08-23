@@ -14,7 +14,7 @@ const breads = [bread1, bread2];
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#8d6e63',
+      main: '#4E342E',
     },
     secondary: {
       main: '#ff6f00',

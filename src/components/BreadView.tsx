@@ -1,14 +1,14 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { AppBar, Box, Button, Card, CardActions, CardContent, Container, IconButton, Stack, Toolbar, Typography } from "@mui/material";
+import { Button, Card, CardActions, CardContent, IconButton, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { Step } from "../model/bread";
 import { getBread } from "../model/store";
-import { HeaderMenu } from './HeaderMenu';
+import { Page } from './Page';
 
 function StepBoxItem(props: { title: string, value: string }) {
     return <div style={{ display: "flex" }}>
         <div style={{ textAlign: "left" }}>
-            <Typography color={'text.primary'}>{props.title}</Typography>
+            <Typography color={'text.primary'} align='left'>{props.title}</Typography>
         </div>
         <div style={{ textAlign: "right", flex: 1 }} >
             <Typography color={'text.secondary'}>{props.value}</Typography>
@@ -19,7 +19,7 @@ function StepBoxItem(props: { title: string, value: string }) {
 function StepBox(props: { step: Step }) {
     return <Card sx={{ minWidth: 275 }}>
         <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
+            <Typography gutterBottom variant="h6" component="div">
                 {props.step.name}
             </Typography>
             <StepBoxItem title={'Start Time'} value={props.step.trigger?.startTime?.toLocaleTimeString() ?? ''} />
@@ -57,7 +57,7 @@ export function BreadView() {
     </IconButton>;
     const stepBoxList = <StepBoxList steps={bread.steps} />;
 
-    return <HeaderMenu title={bread.name} navigationIcon={navigationIcon} >
+    return <Page title={bread.name} navigationIcon={navigationIcon} >
         {stepBoxList}
-    </HeaderMenu>
+    </Page>
 }
