@@ -1,7 +1,7 @@
 import { AppBar, Box, Button, Card, CardActions, CardContent, Container, IconButton, Paper, Stack, Toolbar, Typography } from "@mui/material";
 import { Step } from "../model/bread";
-import MenuIcon from '@mui/icons-material/Menu';
-import { useParams } from "react-router-dom";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate, useParams } from "react-router-dom";
 import { getBread } from "../model/store";
 
 function StepBoxItem(props: { title: string, value: string }) {
@@ -40,6 +40,7 @@ export function BreadView() {
     const params = useParams();
     const uuid = Number(params.uuid!);
     const bread = getBread(uuid);
+    const navigate = useNavigate();
 
     return <Container maxWidth={'sm'}>
         <Box sx={{ flexGrow: 1 }}>
@@ -49,11 +50,11 @@ export function BreadView() {
                         size="large"
                         edge="start"
                         color="inherit"
-                        aria-label="menu"
+                        aria-label="back"
                         sx={{ mr: 2 }}
-                        onClick={() => alert('not implemented')}
+                        onClick={() => navigate('/')}
                     >
-                        <MenuIcon/>
+                        <ArrowBackIcon/>
                     </IconButton>
                     <Typography variant="h6" component="div" align='left' sx={{ flexGrow: 1 }}>
                         {bread.name}

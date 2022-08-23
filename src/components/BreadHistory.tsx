@@ -25,7 +25,7 @@ export function BreadHistory(props: { breads: Bread[] }) {
         <Box sx={{ height: '100%' }}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton
+                    {/* <IconButton
                         size="large"
                         edge="start"
                         color="inherit"
@@ -34,7 +34,7 @@ export function BreadHistory(props: { breads: Bread[] }) {
                         onClick={() => alert('not implemented')}
                     >
                         <MenuIcon />
-                    </IconButton>
+                    </IconButton> */}
                     <Typography variant="h6" component="div" align='left' sx={{ flexGrow: 1 }}>
                         {"History"}
                     </Typography>
