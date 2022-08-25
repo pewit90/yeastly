@@ -43,7 +43,7 @@ export class Step {
             obj.name,
             toBoolean(obj.autostart),
             toDateOrUndefined(obj.startedAt),
-            toDateOrUndefined(obj.startedAt),
+            toDateOrUndefined(obj.completedAt),
             toNumberOrUndefined(obj.duration),
         );
     }

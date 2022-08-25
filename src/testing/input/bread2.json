@@ -5,23 +5,20 @@
     "steps": [
         {
             "name": "Poolish",
-            "completed": false,
             "autostart": false
         },
         {
             "name": "Fermenting",
-            "completed": false,
             "autostart": true
         },
         {
             "name": "Move to panettone",
-            "autostart": false,
-            "completed": false
+            "autostart": false
         },
         {
             "name": "Bake at 175",
             "autostart": false,
-            "completed": false
+            "duration": 2700
         }
     ]
 }
