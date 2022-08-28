@@ -14,16 +14,12 @@ export enum StepState {
 export class Step {
   [immerable] = true;
 
-  get pending(): boolean {
-    return !this.started && !this.completed;
+  private get started(): boolean {
+    return this.startedAt !== undefined && this.completedAt == undefined;
   }
 
-  get started(): boolean {
-    return this.startedAt !== undefined;
-  }
-
-  get completed(): boolean {
-    return this.completedAt !== undefined;
+  private get completed(): boolean {
+    return this.startedAt !== undefined && this.completedAt !== undefined;
   }
 
   get state(): StepState {

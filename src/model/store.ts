@@ -37,7 +37,7 @@ export function getBreads(): Bread[] {
   return Object.values(breadIndex);
 }
 
-export function updateBread(bread: Bread) {
+export function storeBread(bread: Bread) {
   localStorage.setItem(bread.uuid.toString(), JSON.stringify(bread));
   breadIndex[bread.uuid] = bread;
 }

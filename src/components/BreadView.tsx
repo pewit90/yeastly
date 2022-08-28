@@ -1,12 +1,15 @@
+import { BrandingWatermark } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import Step_MUI from "@mui/material/Step";
 import StepContent_MUI from "@mui/material/StepContent";
 import StepLabel_MUI from "@mui/material/StepLabel";
 import Stepper_MUI from "@mui/material/Stepper";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
-import { getBread } from "../model/store";
+import { StepState } from "../model/step";
+import { getBread, storeBread } from "../model/store";
 import { Page } from "./Page";
 
 /* Steps view */
@@ -38,7 +41,10 @@ export function StepList(props: {
     <Stepper_MUI activeStep={bread.currentStepIndex} orientation="vertical">
       {steps.map((step, index) => {
         return (
-          <Step_MUI key={step.name + index} completed={step.completed}>
+          <Step_MUI
+            key={step.name + index}
+            completed={step.state === StepState.COMPLETED}
+          >
             <StepLabel_MUI>{step.name}</StepLabel_MUI>
             <StepContent_MUI>
               {step.startedAt && (
@@ -47,15 +53,27 @@ export function StepList(props: {
                   value={step.startedAt?.toLocaleTimeString() ?? ""}
                 />
               )}
+              <StepBoxItem title="State" value={step.state} />
               <Box sx={{ mb: 2 }}>
                 <div>
-                  <Button
-                    variant="contained"
-                    onClick={onContinue}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    {index === steps.length - 1 ? "Finish" : "Continue"}
-                  </Button>
+                  {step.state === StepState.PENDING && (
+                    <Button
+                      variant="contained"
+                      onClick={onStartStep}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      Start
+                    </Button>
+                  )}
+                  {step.state === StepState.STARTED && (
+                    <Button
+                      variant="contained"
+                      onClick={onContinue}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      {index === steps.length - 1 ? "Finish" : "Continue"}
+                    </Button>
+                  )}
                   <Button
                     disabled={index === 0}
                     onClick={onBack}
@@ -76,7 +94,7 @@ export function StepList(props: {
 export function BreadView() {
   const params = useParams();
   const uuid = Number(params.uuid!);
-  const bread = getBread(uuid);
+  const [bread, setBread] = useState(() => getBread(uuid));
   const navigate = useNavigate();
 
   const navigationIcon = (
@@ -92,10 +110,21 @@ export function BreadView() {
     </IconButton>
   );
 
-  const handleContinue = () => {};
+  const updateBread = (mutate: (bread: Bread) => Bread) => {
+    const nextBread = mutate(bread);
+    storeBread(nextBread);
+    setBread(nextBread);
+  };
 
-  const handleBack = () => {};
-  const handleStartStep = () => {};
+  const handleContinue = () => {
+    updateBread((bread) => bread.continue());
+  };
+  const handleBack = () => {
+    updateBread((bread) => bread.back());
+  };
+  const handleStartStep = () => {
+    updateBread((bread) => bread.startStep());
+  };
 
   return (
     <Page title={bread.name} navigationIcon={navigationIcon}>
