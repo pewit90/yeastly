@@ -27,26 +27,16 @@ function StepBoxItem(props: { title: string, value: string }) {
     </div>
 }
 
-export function StepList(props: { bread: Bread }) {
-    // TODO is this the correct way to get notified by updates?
-    const [activeStep, setActiveStep] = React.useState(props.bread.currentStepIndex);
-    const steps = props.bread.steps; //todo this might also get updated
+export function StepList(props: {
+    bread: Bread,
+    onContinue: () => void,
+    onStartStep: () => void,
+    onBack: () => void 
+}) {
+    const {bread, onContinue, onStartStep, onBack} = props;
+    const steps = bread.steps; //todo this might also get updated
 
-    const handleNext = (step:Step,index:number) => {
-        // TODO
-        const updatedStep = Step.fromObject({
-            ...step,
-            completed: true,
-            completedAt: new Date()
-        });
-        steps[index] = updatedStep;
-        setActiveStep(props.bread.currentStepIndex);
-    }
-    const handleBack = () => {
-        // TODO
-    }
-
-    return <Stepper_MUI activeStep={activeStep} orientation='vertical'>
+    return <Stepper_MUI activeStep={bread.currentStepIndex} orientation='vertical'>
         {steps.map((step, index) => {
             return <Step_MUI key={step.name + index} completed={step.completed} >
                 <StepLabel_MUI  >{step.name}</StepLabel_MUI>
@@ -56,14 +46,14 @@ export function StepList(props: { bread: Bread }) {
                         <div>
                             <Button
                                 variant="contained"
-                                onClick={()=>handleNext(step,index)}
+                                onClick={onContinue}
                                 sx={{ mt: 1, mr: 1 }}
                             >
                                 {index === steps.length - 1 ? 'Finish' : 'Continue'}
                             </Button>
                             <Button
                                 disabled={index === 0}
-                                onClick={handleBack}
+                                onClick={onBack}
                                 sx={{ mt: 1, mr: 1 }}
                             >
                                 Back
@@ -74,8 +64,6 @@ export function StepList(props: { bread: Bread }) {
             </Step_MUI>
         })}
     </Stepper_MUI>
-
-
 }
 
 export function BreadView() {
@@ -94,9 +82,26 @@ export function BreadView() {
     >
         <ArrowBackIcon />
     </IconButton>;
-    const stepList = <StepList bread={bread} />;
 
-    return <Page title={bread.name} navigationIcon={navigationIcon} >
-        {stepList}
-    </Page>
+    const handleContinue = () => {
+    }
+
+    const handleBack = () => {
+
+    }
+    const handleStartStep = () => {
+
+    }
+
+    return (
+        <Page title={bread.name} navigationIcon={navigationIcon} >
+            <StepList
+                bread={bread}
+                onContinue={handleContinue}
+                onBack={handleBack}
+                onStartStep={handleStartStep}
+            />
+        </Page>
+    );
+
 }

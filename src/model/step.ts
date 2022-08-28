@@ -1,3 +1,4 @@
+import { immerable } from "immer";
 import { toBoolean, toDateOrUndefined, toNumberOrUndefined } from "../utils/conversion-utils";
 
 export enum StepState {
@@ -7,6 +8,8 @@ export enum StepState {
 }
 
 export class Step {
+
+    [immerable] = true;
 
     get pending(): boolean {
         return !this.started && !this.completed;        
