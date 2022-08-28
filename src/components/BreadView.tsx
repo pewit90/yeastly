@@ -1,10 +1,17 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Button, Card, CardActions, CardContent, Container, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
+import Step_MUI from '@mui/material/Step';
+import StepContent_MUI from '@mui/material/StepContent';
+import StepLabel_MUI from '@mui/material/StepLabel';
+import Stepper_MUI from '@mui/material/Stepper';
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from '../model/bread';
 import { Step } from "../model/step";
 import { getBread } from "../model/store";
 import { Page } from './Page';
+
+import React from 'react';
+
 
 /*
     Steps view
@@ -20,69 +27,57 @@ function StepBoxItem(props: { title: string, value: string }) {
     </div>
 }
 
-function StepBox(props: { step: Step, index: number, currentStepIndex: number }) {
-    const step = props.step;
-    const index = props.index;
-    const currentStepIndex = props.currentStepIndex;
-    return <Card key={step.name + index} sx={{ minWidth: 275 }}>
-        <CardContent>
-            <Typography gutterBottom variant="h6" component="div">
-                {step.name}
-            </Typography>
-            {step.startedAt && <StepBoxItem title="Start Time" value={step.startedAt?.toLocaleTimeString() ?? ''} />}
-            {step.completedAt && <StepBoxItem title="End Time" value={step.completedAt?.toLocaleTimeString() ?? ''} />}
-            <StepBoxItem title="State" value={step.state} />
-        </CardContent>
-        <CardActions>
-            {index === currentStepIndex && <Button size="small" variant='contained' color='primary'>Complete</Button>}
-        </CardActions>
-    </Card>
+export function StepList(props: { bread: Bread }) {
+    // TODO is this the correct way to get notified by updates?
+    const [activeStep, setActiveStep] = React.useState(props.bread.currentStepIndex);
+    const steps = props.bread.steps; //todo this might also get updated
+
+    const handleNext = (step:Step,index:number) => {
+        // TODO
+        const updatedStep = Step.fromObject({
+            ...step,
+            completed: true,
+            completedAt: new Date()
+        });
+        steps[index] = updatedStep;
+        setActiveStep(props.bread.currentStepIndex);
+    }
+    const handleBack = () => {
+        // TODO
+    }
+
+    return <Stepper_MUI activeStep={activeStep} orientation='vertical'>
+        {steps.map((step, index) => {
+            return <Step_MUI key={step.name + index} completed={step.completed} >
+                <StepLabel_MUI  >{step.name}</StepLabel_MUI>
+                <StepContent_MUI>
+                    {step.startedAt && <StepBoxItem title="Start Time" value={step.startedAt?.toLocaleTimeString() ?? ''} />}
+                    <Box sx={{ mb: 2 }}>
+                        <div>
+                            <Button
+                                variant="contained"
+                                onClick={()=>handleNext(step,index)}
+                                sx={{ mt: 1, mr: 1 }}
+                            >
+                                {index === steps.length - 1 ? 'Finish' : 'Continue'}
+                            </Button>
+                            <Button
+                                disabled={index === 0}
+                                onClick={handleBack}
+                                sx={{ mt: 1, mr: 1 }}
+                            >
+                                Back
+                            </Button>
+                        </div>
+                    </Box>
+                </StepContent_MUI>
+            </Step_MUI>
+        })}
+    </Stepper_MUI>
+
+
 }
 
-function StepBoxList(props: { steps: Step[], currentStepIndex: number }) {
-    const stepBoxList = props.steps.map((el, index) => StepBox({ step: el, index: index, currentStepIndex: props.currentStepIndex }));
-    return <Stack spacing={1}>
-        {stepBoxList}
-    </Stack>
-}
-
-/*
-    Dashboard view
-*/
-function BreadDashboard(props: { bread: Bread }) {
-    const bread = props.bread;
-    return <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Grid container spacing={3}>
-
-            <Grid item xs={12} md={8} lg={9}>
-                {/*
-                    Current Step
-                */}
-
-                <StepBox step={bread.steps[bread.currentStepIndex]} index={bread.currentStepIndex} currentStepIndex={bread.currentStepIndex} />
-            </Grid>
-            {/*
-            Projected end time
-            */}
-            <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                    <Card >
-                        <CardContent>
-                            <Typography gutterBottom variant="h6" component="div">
-                                {/* {""+bread.steps.reduce((previous, current)=> {previous+current.duration??0})} */}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Paper>
-            </Grid>
-
-        </Grid>
-    </Container>
-}
-
-/*
-    Tabs
-*/
 export function BreadView() {
     const params = useParams();
     const uuid = Number(params.uuid!);
@@ -99,10 +94,9 @@ export function BreadView() {
     >
         <ArrowBackIcon />
     </IconButton>;
-    const stepBoxList = <StepBoxList steps={bread.steps} currentStepIndex={bread.currentStepIndex} />;
+    const stepList = <StepList bread={bread} />;
 
     return <Page title={bread.name} navigationIcon={navigationIcon} >
-        {stepBoxList}
-        {/* <BreadDashboard bread={bread} /> */}
+        {stepList}
     </Page>
 }
