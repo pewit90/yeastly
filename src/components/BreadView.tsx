@@ -1,15 +1,16 @@
-import { BrandingWatermark } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import Step_MUI from "@mui/material/Step";
 import StepContent_MUI from "@mui/material/StepContent";
 import StepLabel_MUI from "@mui/material/StepLabel";
 import Stepper_MUI from "@mui/material/Stepper";
+import { addSeconds, formatDuration, intervalToDuration } from "date-fns";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
-import { StepState } from "../model/step";
+import { Step, StepState } from "../model/step";
 import { getBread, storeBread } from "../model/store";
+import { usePeriodicConditionalRerender } from "../utils/react-utils";
 import { Page } from "./Page";
 
 /* Steps view */
@@ -37,6 +38,20 @@ export function StepList(props: {
   const { bread, onContinue, onStartStep, onBack } = props;
   const steps = bread.steps; //todo this might also get updated
 
+  // TODO move to StepItem
+  usePeriodicConditionalRerender(1000, () => true);
+
+  const remainingTime = (step: Step) => {
+    if (!step.startedAt || !step.duration) {
+      return null;
+    }
+    const duration = intervalToDuration({
+      start: new Date(),
+      end: addSeconds(step.startedAt, step.duration),
+    });
+    return formatDuration(duration);
+  };
+
   return (
     <Stepper_MUI activeStep={bread.currentStepIndex} orientation="vertical">
       {steps.map((step, index) => {
@@ -51,6 +66,12 @@ export function StepList(props: {
                 <StepBoxItem
                   title="Start Time"
                   value={step.startedAt?.toLocaleTimeString() ?? ""}
+                />
+              )}
+              {step.startedAt && step.duration && (
+                <StepBoxItem
+                  title="Remaining Time"
+                  value={remainingTime(step) ?? ""}
                 />
               )}
               <StepBoxItem title="State" value={step.state} />

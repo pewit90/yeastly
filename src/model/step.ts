@@ -15,7 +15,7 @@ export class Step {
   [immerable] = true;
 
   private get started(): boolean {
-    return this.startedAt !== undefined && this.completedAt == undefined;
+    return this.startedAt !== undefined && this.completedAt === undefined;
   }
 
   private get completed(): boolean {
