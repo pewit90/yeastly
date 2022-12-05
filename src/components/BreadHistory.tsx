@@ -1,14 +1,36 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Fab, List, ListItem, ListItemText, Typography } from "@mui/material";
+import {
+  Fab,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  IconButton,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Page } from "./Page";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { createAndStoreBread, deleteBread } from "../model/store";
 
 function BreadListItem(props: { bread: Bread }) {
   const navigate = useNavigate();
   return (
-    <ListItem onClick={() => navigate("/" + props.bread.uuid)}>
+    <ListItem
+      secondaryAction={
+        <IconButton
+          edge="end"
+          aria-label="delete"
+          onClick={() => {
+            deleteBread(props.bread.uuid);
+          }}
+        >
+          <DeleteIcon />
+        </IconButton>
+      }
+    >
       <ListItemText
+        onClick={() => navigate("/" + props.bread.uuid)}
         primary={
           <Typography color={"text.primary"} variant="h6">
             {props.bread.name}{" "}
@@ -38,7 +60,7 @@ export function BreadHistory(props: { breads: Bread[] }) {
       color="secondary"
       aria-label="add"
       onClick={() => {
-        alert("TODO: New Bread goes here");
+        createAndStoreBread();
       }}
     >
       <AddIcon />
