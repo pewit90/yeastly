@@ -25,31 +25,29 @@ function readStorage(): Bread[] {
   }
 }
 
-function getBreadUUIDs(): number[]{
+function getBreadUUIDs(): number[] {
   const breadUUIDs = localStorage.getItem(BREAD_UUIDS);
-  if(!breadUUIDs)
-    throw new Error("breadUUIDs missing.");
+  if (!breadUUIDs) throw new Error("breadUUIDs missing.");
   return JSON.parse(breadUUIDs) as number[];
 }
 
-function setBreadUUIDs(uuids: number[]){
+function setBreadUUIDs(uuids: number[]) {
   localStorage.setItem(BREAD_UUIDS, JSON.stringify(uuids));
 }
 
-function deleteBreadUUID(uuid: number){
+function deleteBreadUUID(uuid: number) {
   const breadUUIDs = getBreadUUIDs();
   const index = breadUUIDs.indexOf(uuid);
-  if(index > -1)
-    breadUUIDs.splice(index,1);
+  if (index > -1) breadUUIDs.splice(index, 1);
   setBreadUUIDs(breadUUIDs);
 }
 
-function addBreadUUID(uuid:number){
+function addBreadUUID(uuid: number) {
   const breadUUIDs = getBreadUUIDs();
   setBreadUUIDs(breadUUIDs.concat(uuid));
 }
 
-const breadIndex : Record<number, Bread> = readStorage().reduce(
+const breadIndex: Record<number, Bread> = readStorage().reduce(
   (acc, current) => ({ ...acc, [current.uuid]: current }),
   {} as Record<number, Bread>
 );
@@ -59,7 +57,7 @@ export function getBread(uuid: number): Bread {
 }
 
 export function getBreads(): Bread[] {
-  console.log("getBreads "+JSON.stringify(Object.values(breadIndex)));
+  console.log("getBreads " + JSON.stringify(Object.values(breadIndex)));
   return Object.values(breadIndex);
 }
 
@@ -69,15 +67,20 @@ export function storeBread(bread: Bread) {
   addBreadUUID(bread.uuid);
 }
 
-export function deleteBread(uuid: number){
+export function deleteBread(uuid: number) {
   deleteBreadUUID(uuid);
   localStorage.removeItem(uuid.toString());
-  console.info("Deleted "+uuid);
+  console.info("Deleted " + uuid);
 }
 
-export function createAndStoreBread(name?: string, steps?:Step[]){
+export function createAndStoreBread(name?: string, steps?: Step[]) {
   const timestamp = new Date();
-  const bread = new Bread(timestamp.getTime(), name??"New Bread", steps??[], timestamp);
+  const bread = new Bread(
+    timestamp.getTime(),
+    name ?? "New Bread",
+    steps ?? [],
+    timestamp
+  );
   storeBread(bread);
   return bread;
 }
