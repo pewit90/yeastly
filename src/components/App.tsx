@@ -4,6 +4,7 @@ import { getBreads } from "../model/store";
 import "./App.css";
 import { BreadHistory } from "./BreadHistory";
 import { BreadView } from "./BreadView";
+import { EditBread } from "./EditBread";
 import { HydrationCalculator } from "./HydrationCalculatorPage";
 
 export const theme = createTheme({
@@ -23,6 +24,8 @@ function App() {
       <Routes>
         <Route path="/" element={<BreadHistory breads={getBreads()} />} />
         <Route path="/:uuid" element={<BreadView />} />
+        <Route path="/edit" element={<EditBread />} />
+
         <Route path="/calculator" element={<HydrationCalculator />} />
       </Routes>
     </ThemeProvider>

@@ -27,7 +27,7 @@ function readStorage(): Bread[] {
 
 function getBreadUUIDs(): number[] {
   const breadUUIDs = localStorage.getItem(BREAD_UUIDS);
-  if (!breadUUIDs) throw new Error("breadUUIDs missing.");
+  if (!breadUUIDs) throw new Error(BREAD_UUIDS + " missing.");
   return JSON.parse(breadUUIDs) as number[];
 }
 
@@ -42,9 +42,14 @@ function deleteBreadUUID(uuid: number) {
   setBreadUUIDs(breadUUIDs);
 }
 
+/**
+ * Add a bread to list of UUIDs, if it is not already added.
+ * @param uuid The uuid of the bread
+ */
 function addBreadUUID(uuid: number) {
   const breadUUIDs = getBreadUUIDs();
-  setBreadUUIDs(breadUUIDs.concat(uuid));
+  const index = breadUUIDs.find((val) => val === uuid);
+  if (!index) setBreadUUIDs(breadUUIDs.concat(uuid));
 }
 
 const breadIndex: Record<number, Bread> = readStorage().reduce(
@@ -57,7 +62,6 @@ export function getBread(uuid: number): Bread {
 }
 
 export function getBreads(): Bread[] {
-  console.log("getBreads " + JSON.stringify(Object.values(breadIndex)));
   return Object.values(breadIndex);
 }
 
@@ -70,6 +74,7 @@ export function storeBread(bread: Bread) {
 export function deleteBread(uuid: number) {
   deleteBreadUUID(uuid);
   localStorage.removeItem(uuid.toString());
+  delete breadIndex[uuid];
   console.info("Deleted " + uuid);
 }
 
