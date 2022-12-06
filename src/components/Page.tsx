@@ -5,7 +5,7 @@ export function Page(props: {
   title: string;
   navigationIcon?: ReactNode;
   fabButton?: ReactNode;
-  children: ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <Container maxWidth={"sm"}>
