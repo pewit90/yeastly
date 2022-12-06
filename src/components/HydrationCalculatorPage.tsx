@@ -1,6 +1,6 @@
 import { Page } from "./Page";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Typography } from "@mui/material";
+import { Typography, FilledInput } from "@mui/material";
 import { Hydration } from "../model/hydration";
 import React, { useState } from "react";
 import Input from "@mui/material/Input";
@@ -11,20 +11,16 @@ function Label(props: { text: string }) {
 }
 
 function NumberDisplayField(props: { value: number; unit: string }) {
-  return <Typography align="right">{props.value + props.unit}</Typography>;
-}
-
-function NumberInputField(props: {
-  value: number;
-  unit: string;
-  onChange: Function;
-}) {
   return (
-    <Input
+    // <Typography variant="h6" align="right">
+    //   {props.value + props.unit}
+    // </Typography>
+    <FilledInput
       fullWidth
+      readOnly
       value={props.value}
       type="number"
-      onChange={(e) => props.onChange(e.target.value)}
+      unselectable="on"
       endAdornment={
         <InputAdornment position="end">{props.unit}</InputAdornment>
       }
@@ -32,11 +28,47 @@ function NumberInputField(props: {
   );
 }
 
-export function HydrationCalculator(props: {}) {
-  const [hydration, setHydration] = useState(new Hydration(1000, 80, 2));
+function NumberInputField(props: {
+  value: number;
+  unit: string;
+  onChange: Function;
+  filled?: boolean;
+}) {
+  if (!props.filled) {
+    return (
+      <Input
+        fullWidth
+        value={props.value}
+        type="number"
+        onChange={(e) => props.onChange(e.target.value)}
+        endAdornment={
+          <InputAdornment position="end">{props.unit}</InputAdornment>
+        }
+      />
+    );
+  } else {
+    return (
+      <FilledInput
+        fullWidth
+        value={props.value}
+        type="number"
+        color="warning"
+        onChange={(e) => props.onChange(e.target.value)}
+        endAdornment={
+          <InputAdornment position="end">{props.unit}</InputAdornment>
+        }
+      />
+    );
+  }
+}
+
+export function HydrationCalculator(props: { hydration?: Hydration }) {
+  const [hydration, setHydration] = useState(
+    props.hydration ?? new Hydration(1000, 80, 2)
+  );
   return (
     <Page title="Hydration Calculator">
-      <Grid container spacing={2}>
+      <Grid container spacing={3} margin={3}>
         <Grid xs={4}>
           <Label text="Flour" />
         </Grid>
@@ -59,9 +91,6 @@ export function HydrationCalculator(props: {}) {
           <Label text="Water" />
         </Grid>
         <Grid xs={4}>
-          <NumberDisplayField value={hydration.water} unit="ml" />
-        </Grid>
-        <Grid xs={4}>
           {" "}
           <NumberInputField
             value={hydration.waterPercentage}
@@ -78,10 +107,10 @@ export function HydrationCalculator(props: {}) {
           />
         </Grid>
         <Grid xs={4}>
-          <Label text="Salt" />
+          <NumberDisplayField value={hydration.water} unit="ml" />
         </Grid>
         <Grid xs={4}>
-          <NumberDisplayField value={hydration.salt} unit="g" />
+          <Label text="Salt" />
         </Grid>
         <Grid xs={4}>
           {" "}
@@ -98,6 +127,9 @@ export function HydrationCalculator(props: {}) {
               );
             }}
           />
+        </Grid>
+        <Grid xs={4}>
+          <NumberDisplayField value={hydration.salt} unit="g" />
         </Grid>
       </Grid>
     </Page>
