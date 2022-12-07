@@ -22,7 +22,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Routes>
-        <Route path="/" element={<BreadHistory breads={getBreads()} />} />
+        <Route path="/" element={<BreadHistory />} />
         <Route path="/:uuid" element={<BreadView />} />
         <Route path="/edit" element={<EditBread />} />
 

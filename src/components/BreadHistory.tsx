@@ -11,9 +11,10 @@ import { useNavigate } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Page } from "./Page";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { createAndStoreBread, deleteBread } from "../model/store";
+import { deleteBread, getBreads } from "../model/store";
+import { useState } from "react";
 
-function BreadListItem(props: { bread: Bread }) {
+function BreadListItem(props: { bread: Bread; onChange: Function }) {
   const navigate = useNavigate();
   return (
     <ListItem
@@ -23,6 +24,7 @@ function BreadListItem(props: { bread: Bread }) {
           aria-label="delete"
           onClick={() => {
             deleteBread(props.bread.uuid);
+            props.onChange();
           }}
         >
           <DeleteIcon />
@@ -46,16 +48,25 @@ function BreadListItem(props: { bread: Bread }) {
   );
 }
 
-function BreadList(props: { breads: Bread[] }) {
+function BreadList(props: { breads: Bread[]; onChange: Function }) {
   const items = props.breads.map((el) => (
-    <BreadListItem bread={el} key={el.uuid} />
+    <BreadListItem bread={el} key={el.uuid} onChange={() => props.onChange()} />
   ));
   return <List>{items}</List>;
 }
 
-export function BreadHistory(props: { breads: Bread[] }) {
+export function BreadHistory() {
   const navigate = useNavigate();
-  const breadList = <BreadList breads={props.breads} />;
+  const [breads, setBreadList] = useState(getBreads());
+  const breadList = (
+    <BreadList
+      breads={breads}
+      onChange={() => {
+        const currentBreads = getBreads();
+        setBreadList(currentBreads);
+      }}
+    />
+  );
   const newBreadButton = (
     <Fab
       color="secondary"
