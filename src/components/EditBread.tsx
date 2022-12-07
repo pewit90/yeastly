@@ -1,34 +1,32 @@
-import { Bread } from "../model/bread";
-import { Page } from "./Page";
-import {
-  IconButton,
-  TextField,
-  Box,
-  Checkbox,
-  Typography,
-  Button,
-} from "@mui/material";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { storeBread } from "../model/store";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import { Box, Checkbox, IconButton, TextField } from "@mui/material";
 import { Stack } from "@mui/system";
-import { Step } from "../model/step";
 import { produce } from "immer";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Bread } from "../model/bread";
+import { Step } from "../model/step";
+import { storeBread } from "../model/store";
+import { Page } from "./Page";
 
 function EditStep(props: {
   step: Step;
-  onChange: Function;
+  onPropertyChange: Function;
   onMoveUp: Function;
   onMoveDown: Function;
+  onDelete: Function;
 }) {
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newStep = produce(props.step, (draft) => {
       draft.name = e.target.value;
     });
-    props.onChange(newStep);
+    props.onPropertyChange(newStep);
   };
   const handleAutostartChange = (
     _e: React.ChangeEvent<HTMLInputElement>,
@@ -37,13 +35,13 @@ function EditStep(props: {
     const newStep = produce(props.step, (draft) => {
       draft.autostart = checked;
     });
-    props.onChange(newStep);
+    props.onPropertyChange(newStep);
   };
   const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newStep = produce(props.step, (draft) => {
       draft.duration = +e.target.value;
     });
-    props.onChange(newStep);
+    props.onPropertyChange(newStep);
   };
   const handleHasDurationChange = (
     _e: React.ChangeEvent<HTMLInputElement>,
@@ -52,7 +50,7 @@ function EditStep(props: {
     const newStep = produce(props.step, (draft) => {
       draft.duration = checked ? 0 : undefined;
     });
-    props.onChange(newStep);
+    props.onPropertyChange(newStep);
   };
 
   return (
@@ -73,6 +71,8 @@ function EditStep(props: {
       <Box
         sx={{
           flex: 0,
+          mt: "1rem",
+          mb: "-1rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -81,17 +81,28 @@ function EditStep(props: {
         <RadioButtonUncheckedIcon fontSize="large" color="primary" />
         <Box
           component="span"
-          sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
+          sx={{
+            flex: "1",
+            width: "1px",
+            backgroundColor: "text.secondary",
+          }}
         ></Box>
       </Box>
       <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
-        <TextField
-          label="Step Description"
-          sx={{ lineHeight: 1, mt: "0.5rem", mb: "0.5rem" }}
-          value={props.step.name}
-          onChange={handleNameChange}
-          fullWidth
-        />
+        <Stack direction={"row"} width="100%">
+          <TextField
+            label="Step Description"
+            sx={{ lineHeight: 1, mt: "0.5rem", mb: "0.5rem" }}
+            value={props.step.name}
+            onChange={handleNameChange}
+          />
+          <RemoveCircleIcon
+            sx={{ mt: "1rem" }}
+            fontSize="large"
+            color="secondary"
+            onClick={() => props.onDelete()}
+          />
+        </Stack>
         <Box>
           Autostart
           <Checkbox
@@ -99,7 +110,7 @@ function EditStep(props: {
             onChange={handleAutostartChange}
           />
         </Box>
-        <Box mt="1rem" mb="2rem" justifyContent="start">
+        <Box>
           Duration
           <Checkbox
             checked={props.step.duration !== undefined}
@@ -126,7 +137,7 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
     setSteps(newSteps);
     props.onChange(steps);
   };
-  const handleStepChange = (newStep: Step, index: number) => {
+  const handleStepPropertyChange = (newStep: Step, index: number) => {
     const newSteps = produce(steps, (draft) => {
       draft[index] = newStep;
     });
@@ -155,18 +166,28 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
       props.onChange(steps);
     }
   };
+  const handleStepDeletion = (index: number) => {
+    const newSteps = produce(steps, (draft) => {
+      draft.splice(index, 1);
+    });
+    setSteps(newSteps);
+    props.onChange(steps);
+  };
   return (
     <Box mt="2rem">
       {steps.map((step, index) => (
         <EditStep
           step={step}
           key={"step_" + index}
-          onChange={(newStep: Step) => handleStepChange(newStep, index)}
+          onPropertyChange={(newStep: Step) =>
+            handleStepPropertyChange(newStep, index)
+          }
           onMoveUp={() => handleMoveUp(index)}
           onMoveDown={() => handleMoveDown(index)}
+          onDelete={() => handleStepDeletion(index)}
         />
       ))}
-      <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
+      <Box sx={{ mt: "1rem", display: "flex", gap: "0.4rem", width: "100%" }}>
         <Box sx={{ mt: "0.1rem", width: "3rem", fontWeight: "bold" }} />
         <AddCircleIcon
           fontSize="large"
@@ -179,6 +200,19 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
 }
 
 export function EditBread(props: { bread?: Bread }) {
+  const navigate = useNavigate();
+  const navigationIcon = (
+    <IconButton
+      size="large"
+      edge="start"
+      color="inherit"
+      aria-label="back"
+      sx={{ mr: 2 }}
+      onClick={() => navigate("/")}
+    >
+      <ArrowBackIcon />
+    </IconButton>
+  );
   const timestamp = new Date();
   const [bread, setBread] = useState(
     props.bread
@@ -190,10 +224,20 @@ export function EditBread(props: { bread?: Bread }) {
           timestamp
         )
   );
+  const handleBreadNameChange = (name: string) => {
+    const newBread = produce(bread, (draft) => {
+      draft.name = name;
+    });
+    setBread(newBread);
+  };
   return (
-    <Page title="Edit Bread">
+    <Page title="Edit Bread" navigationIcon={navigationIcon}>
       <Stack padding={5}>
-        <TextField label="Name" value={bread.name} />
+        <TextField
+          label="Name"
+          value={bread.name}
+          onChange={(e) => handleBreadNameChange(e.target.value)}
+        />
         <EditSteps
           steps={bread.steps}
           onChange={(stepList: Step[]) => {
@@ -203,15 +247,24 @@ export function EditBread(props: { bread?: Bread }) {
             setBread(newBread);
           }}
         />
-        <IconButton
-          edge="start"
-          aria-label="Create"
-          onClick={() => {
-            storeBread(bread);
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "end",
           }}
         >
-          <AddCircleIcon />
-        </IconButton>
+          <IconButton
+            edge="start"
+            aria-label="Create"
+            onClick={() => {
+              storeBread(bread);
+              navigate("/" + bread.uuid);
+            }}
+          >
+            <CheckCircleIcon sx={{ fontSize: "48px" }} color="secondary" />
+          </IconButton>
+        </Box>
       </Stack>
     </Page>
   );

@@ -54,13 +54,14 @@ function BreadList(props: { breads: Bread[] }) {
 }
 
 export function BreadHistory(props: { breads: Bread[] }) {
+  const navigate = useNavigate();
   const breadList = <BreadList breads={props.breads} />;
   const newBreadButton = (
     <Fab
       color="secondary"
       aria-label="add"
       onClick={() => {
-        createAndStoreBread();
+        navigate("/edit");
       }}
     >
       <AddIcon />
