@@ -9,10 +9,10 @@ import { Box, Checkbox, IconButton, TextField } from "@mui/material";
 import { Stack } from "@mui/system";
 import { produce } from "immer";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step } from "../model/step";
-import { storeBread } from "../model/store";
+import { getBread, storeBread } from "../model/store";
 import { Page } from "./Page";
 
 function EditStep(props: {
@@ -199,7 +199,12 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
   );
 }
 
-export function EditBread(props: { bread?: Bread }) {
+export function EditBread() {
+  const params = useParams();
+  const uuid: number | undefined = params.uuid
+    ? (params.uuid as unknown as number)
+    : undefined;
+  console.log("edit uuid " + uuid);
   const navigate = useNavigate();
   const navigationIcon = (
     <IconButton
@@ -215,12 +220,12 @@ export function EditBread(props: { bread?: Bread }) {
   );
   const timestamp = new Date();
   const [bread, setBread] = useState(
-    props.bread
-      ? props.bread
+    uuid
+      ? produce(getBread(uuid), (draft) => draft)
       : new Bread(
           timestamp.getTime(),
           "New Bread",
-          [new Step("new", false)],
+          [new Step("", false)],
           timestamp
         )
   );
@@ -259,7 +264,7 @@ export function EditBread(props: { bread?: Bread }) {
             aria-label="Create"
             onClick={() => {
               storeBread(bread);
-              navigate("/" + bread.uuid);
+              navigate(-1);
             }}
           >
             <CheckCircleIcon sx={{ fontSize: "48px" }} color="secondary" />

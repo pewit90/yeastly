@@ -1,17 +1,17 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Box, Button, IconButton, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import { Box, Button, IconButton, Typography } from "@mui/material";
+import { addMinutes, intervalToDuration } from "date-fns";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step, StepState } from "../model/step";
 import { getBread, storeBread } from "../model/store";
 import { Page } from "./Page";
-import { addMinutes, intervalToDuration } from "date-fns";
-import { ContentCopy } from "@mui/icons-material";
-
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import Fab from "@mui/material/Fab";
 export interface StepViewProps {
   step: Step;
   isCurrent?: boolean;
@@ -146,6 +146,17 @@ export function BreadView() {
       <ArrowBackIcon />
     </IconButton>
   );
+  const editIcon = (
+    <Fab
+      color="secondary"
+      aria-label="edit"
+      onClick={() => {
+        navigate("/edit/" + uuid);
+      }}
+    >
+      <ModeEditIcon />
+    </Fab>
+  );
 
   const updateBread = (mutate: (bread: Bread) => Bread) => {
     const nextBread = mutate(bread);
@@ -162,9 +173,12 @@ export function BreadView() {
   const handleStartStep = () => {
     updateBread((bread) => bread.startStep());
   };
-
   return (
-    <Page title={bread.name} navigationIcon={navigationIcon}>
+    <Page
+      title={bread.name}
+      navigationIcon={navigationIcon}
+      fabButton={editIcon}
+    >
       <Box mt="5px">
         {bread.steps.map((step: Step, index) => (
           <StepView

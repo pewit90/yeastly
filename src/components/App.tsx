@@ -1,6 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material";
+import path from "path";
 import { Route, Routes } from "react-router-dom";
-import { getBreads } from "../model/store";
 import "./App.css";
 import { BreadHistory } from "./BreadHistory";
 import { BreadView } from "./BreadView";
@@ -25,7 +25,7 @@ function App() {
         <Route path="/" element={<BreadHistory />} />
         <Route path="/:uuid" element={<BreadView />} />
         <Route path="/edit" element={<EditBread />} />
-
+        <Route path="/edit/:uuid" element={<EditBread />} />
         <Route path="/calculator" element={<HydrationCalculator />} />
       </Routes>
     </ThemeProvider>
