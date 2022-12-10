@@ -12,10 +12,13 @@ import { getBread, storeBread } from "../model/store";
 import { Page } from "./Page";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import Fab from "@mui/material/Fab";
+
 export interface StepViewProps {
   step: Step;
   isCurrent?: boolean;
   onStart: () => void;
+  onContinue: () => void;
+  onBack: () => void;
 }
 
 function remainingDuration(step: Step): Duration | null {
@@ -53,7 +56,13 @@ function formatDuration(duration: Duration | null): string | null {
   return `${duration.minutes ?? 0}m ${formatZero(duration.seconds ?? 0)}s`;
 }
 
-function StepView({ step, isCurrent, onStart }: StepViewProps) {
+function StepView({
+  step,
+  isCurrent,
+  onStart,
+  onContinue,
+  onBack,
+}: StepViewProps) {
   return (
     <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
       <Box
@@ -98,16 +107,53 @@ function StepView({ step, isCurrent, onStart }: StepViewProps) {
         {isCurrent && (
           <Typography>Bake in Oven with 160 deg bla bla</Typography>
         )}
-        <Box display="flex" mt="1rem" mb="2rem" justifyContent="start">
-          {isCurrent && step.state === StepState.PENDING && (
-            <Button variant="contained" onClick={onStart}>
-              Start
-            </Button>
+        <Box
+          display="flex"
+          mt="1rem"
+          mb="2rem"
+          justifyContent="end"
+          gap="0.5rem"
+        >
+          {isCurrent && (
+            <StepControls
+              state={step.state}
+              onStart={onStart}
+              onContinue={onContinue}
+              onBack={onBack}
+            />
           )}
         </Box>
       </Box>
     </Box>
   );
+}
+
+function StepControls(props: {
+  state: StepState;
+  onStart: () => void;
+  onContinue: () => void;
+  onBack: () => void;
+}) {
+  if (props.state === StepState.PENDING) {
+    return (
+      <Button variant="contained" onClick={props.onStart}>
+        Start
+      </Button>
+    );
+  } else if (props.state === StepState.STARTED) {
+    return (
+      <>
+        {/* <Button variant="contained" onClick={props.onBack}>
+          Back
+        </Button> */}
+        <Button variant="contained" onClick={props.onContinue}>
+          Continue
+        </Button>
+      </>
+    );
+  } else {
+    return null;
+  }
 }
 
 function RefreshContainer(props: { content: () => JSX.Element }) {
@@ -186,6 +232,8 @@ export function BreadView() {
             key={`step_${index}`}
             isCurrent={bread.currentStepIndex === index}
             onStart={handleStartStep}
+            onContinue={handleContinue}
+            onBack={handleBack}
           />
         ))}
       </Box>
