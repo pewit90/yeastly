@@ -59,19 +59,12 @@ export class Bread {
     });
   }
 
-  back(): Bread {
+  reset(): Bread {
     return produce(this, (nextBread) => {
       const currentStepIndex = nextBread.currentStepIndex;
       const currentStep = nextBread.steps[currentStepIndex];
       currentStep.startedAt = undefined;
       currentStep.completedAt = undefined;
-
-      if (currentStepIndex === 0) {
-        return;
-      }
-
-      const previousStep = nextBread.steps[currentStepIndex - 1];
-      previousStep.completedAt = undefined;
     });
   }
 

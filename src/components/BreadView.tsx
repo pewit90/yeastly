@@ -1,24 +1,34 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import Fab from "@mui/material/Fab";
 import { addMinutes, intervalToDuration } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step, StepState } from "../model/step";
 import { getBread, storeBread } from "../model/store";
 import { Page } from "./Page";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import Fab from "@mui/material/Fab";
 
 export interface StepViewProps {
   step: Step;
-  isCurrent?: boolean;
+  isCurrent: boolean;
+  isFirst: boolean;
+  isLast: boolean;
   onStart: () => void;
   onContinue: () => void;
-  onBack: () => void;
+  onReset: () => void;
+  onResumePrevious: () => void;
 }
 
 function remainingDuration(step: Step): Duration | null {
@@ -61,8 +71,27 @@ function StepView({
   isCurrent,
   onStart,
   onContinue,
-  onBack,
+  onReset,
+  onResumePrevious,
 }: StepViewProps) {
+  if (isCurrent) {
+    return (
+      <CurrentStep
+        step={step}
+        onStart={onStart}
+        onContinue={onContinue}
+        onReset={onReset}
+        onResumePrevious={onResumePrevious}
+      />
+    );
+  } else if (step.state === StepState.COMPLETED) {
+    return <CompletedStep step={step} />;
+  } else {
+    return <PendingStep step={step} />;
+  }
+}
+
+function CompletedStep(props: { step: Step }) {
   return (
     <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
       <Box
@@ -73,25 +102,19 @@ function StepView({
           textAlign: "right",
         }}
       >
-        <Box>
-          {isCurrent && (
-            <RefreshContainer
-              content={() => (
-                <Box>{formatDuration(remainingDuration(step))}</Box>
-              )}
-            />
-          )}
-        </Box>
+        <Box sx={{ color: "gray" }}>3h 12m</Box>
       </Box>
       <Box
         sx={{
           flex: 0,
+          minWidth: "3rem",
+          minHeight: "4rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
-        <StepStateIcon state={step.state} />
+        <CheckCircleIcon color="primary" fontSize="large" />
         <Box
           component="span"
           sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
@@ -100,13 +123,119 @@ function StepView({
       <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
         <Typography
           variant="h6"
-          sx={{ lineHeight: 1, mt: "0.5rem", mb: "0.5rem" }}
+          sx={{
+            lineHeight: 1,
+            mt: "0.5rem",
+            mb: "0.5rem",
+          }}
         >
-          {step.name}
+          {props.step.name}
         </Typography>
-        {isCurrent && (
-          <Typography>Bake in Oven with 160 deg bla bla</Typography>
-        )}
+      </Box>
+    </Box>
+  );
+}
+
+function PendingStep(props: { step: Step }) {
+  return (
+    <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
+      <Box
+        sx={{
+          mt: "0.45rem",
+          width: "5rem",
+          fontWeight: "bold",
+          textAlign: "right",
+        }}
+      ></Box>
+      <Box
+        sx={{
+          flex: 0,
+          minWidth: "3rem",
+          minHeight: "4rem",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <RadioButtonUncheckedIcon color="primary" />
+        <Box
+          component="span"
+          sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
+        ></Box>
+      </Box>
+      <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
+        <Typography
+          variant="h6"
+          sx={{
+            lineHeight: 1,
+            mt: "0.2rem",
+            mb: "0.5rem",
+          }}
+        >
+          {props.step.name}
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
+
+function CurrentStep(props: {
+  step: Step;
+  onStart: () => void;
+  onContinue: () => void;
+  onReset: () => void;
+  onResumePrevious: () => void;
+}) {
+  return (
+    <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
+      <Box
+        sx={{
+          mt: "0.5rem",
+          width: "5rem",
+          fontWeight: "bold",
+          textAlign: "right",
+        }}
+      >
+        <Box>
+          <RefreshContainer
+            content={() => (
+              <Box>{formatDuration(remainingDuration(props.step))}</Box>
+            )}
+          />
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          flex: 0,
+          minWidth: "3rem",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <StepMenu
+          onReset={
+            props.step.state === StepState.STARTED ? props.onReset : undefined
+          }
+          onResumePrevious={props.onResumePrevious}
+        />
+        <Box
+          component="span"
+          sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
+        ></Box>
+      </Box>
+      <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
+        <Typography
+          variant="h6"
+          sx={{
+            lineHeight: 1,
+            mt: "0.7rem",
+            mb: "0.5rem",
+          }}
+        >
+          {props.step.name}
+        </Typography>
+        <Typography>Bake in Oven with 160 deg bla bla</Typography>
         <Box
           display="flex"
           mt="1rem"
@@ -114,14 +243,11 @@ function StepView({
           justifyContent="end"
           gap="0.5rem"
         >
-          {isCurrent && (
-            <StepControls
-              state={step.state}
-              onStart={onStart}
-              onContinue={onContinue}
-              onBack={onBack}
-            />
-          )}
+          <StepControls
+            state={props.step.state}
+            onStart={props.onStart}
+            onContinue={props.onContinue}
+          />
         </Box>
       </Box>
     </Box>
@@ -132,7 +258,6 @@ function StepControls(props: {
   state: StepState;
   onStart: () => void;
   onContinue: () => void;
-  onBack: () => void;
 }) {
   if (props.state === StepState.PENDING) {
     return (
@@ -142,18 +267,49 @@ function StepControls(props: {
     );
   } else if (props.state === StepState.STARTED) {
     return (
-      <>
-        {/* <Button variant="contained" onClick={props.onBack}>
-          Back
-        </Button> */}
-        <Button variant="contained" onClick={props.onContinue}>
-          Continue
-        </Button>
-      </>
+      <Button variant="contained" onClick={props.onContinue}>
+        Continue
+      </Button>
     );
   } else {
     return null;
   }
+}
+
+function StepMenu(props: {
+  onReset?: () => void;
+  onResumePrevious?: () => void;
+}) {
+  const iconRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const handleClose = (fnc: () => void) => () => {
+    setOpen(false);
+    fnc();
+  };
+  return (
+    <>
+      <span ref={iconRef} onClick={() => setOpen(true)}>
+        <Fab size="small" color="secondary" sx={{ color: "#fafafa" }}>
+          <MoreVertIcon />
+        </Fab>
+      </span>
+      <Menu
+        id="basic-menu"
+        anchorEl={iconRef.current}
+        open={open}
+        onClose={() => setOpen(false)}
+      >
+        {props.onReset && (
+          <MenuItem onClick={handleClose(props.onReset)}>Reset</MenuItem>
+        )}
+        {props.onResumePrevious && (
+          <MenuItem onClick={handleClose(props.onResumePrevious)}>
+            Resume Previous
+          </MenuItem>
+        )}
+      </Menu>
+    </>
+  );
 }
 
 function RefreshContainer(props: { content: () => JSX.Element }) {
@@ -162,16 +318,6 @@ function RefreshContainer(props: { content: () => JSX.Element }) {
     setInterval(() => setN((old) => !old), 1000);
   }, []);
   return <>{props.content()}</>;
-}
-
-function StepStateIcon({ state }: { state: StepState }) {
-  if (state === StepState.COMPLETED) {
-    return <CheckCircleIcon fontSize="large" color="primary" />;
-  } else if (state === StepState.PENDING) {
-    return <RadioButtonUncheckedIcon fontSize="large" color="primary" />;
-  } else {
-    return <CircleNotificationsIcon fontSize="large" color="secondary" />;
-  }
 }
 
 export function BreadView() {
@@ -213,9 +359,10 @@ export function BreadView() {
   const handleContinue = () => {
     updateBread((bread) => bread.continue());
   };
-  const handleBack = () => {
-    updateBread((bread) => bread.back());
+  const handleReset = () => {
+    updateBread((bread) => bread.reset());
   };
+  const handleResumePrevious = () => {};
   const handleStartStep = () => {
     updateBread((bread) => bread.startStep());
   };
@@ -225,15 +372,18 @@ export function BreadView() {
       navigationIcon={navigationIcon}
       fabButton={editIcon}
     >
-      <Box mt="5px">
+      <Box mt="1rem">
         {bread.steps.map((step: Step, index) => (
           <StepView
             step={step}
             key={`step_${index}`}
             isCurrent={bread.currentStepIndex === index}
+            isFirst={index === 0}
+            isLast={index === bread.steps.length - 1}
             onStart={handleStartStep}
             onContinue={handleContinue}
-            onBack={handleBack}
+            onReset={handleReset}
+            onResumePrevious={handleResumePrevious}
           />
         ))}
       </Box>
