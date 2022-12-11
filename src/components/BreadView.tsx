@@ -177,7 +177,7 @@ function PendingStep(props: { step: Step; isLast: Boolean }) {
           variant="h6"
           sx={{
             lineHeight: 1,
-            mt: "0.2rem",
+            mt: "0.5rem",
             mb: "0.5rem",
           }}
         >
@@ -248,7 +248,9 @@ function CurrentStep(props: {
         >
           {props.step.name}
         </Typography>
-        <Typography>Bake in Oven with 160 deg bla bla</Typography>
+        {props.step.description && (
+          <Typography>{props.step.description}</Typography>
+        )}
         <Box
           display="flex"
           mt="1rem"

@@ -2,6 +2,7 @@ import { Bread } from "./bread";
 import { Step } from "./step";
 import bread1JSON from "../testing/input/bread1.json";
 import bread2JSON from "../testing/input/bread2.json";
+import bread3JSON from "../testing/input/bread3.json";
 
 const BREAD_UUIDS = "bread_uuids";
 
@@ -16,8 +17,9 @@ function readStorage(): Bread[] {
     // TODO initialize with proper default values
     const bread1 = Bread.fromObject(bread1JSON);
     const bread2 = Bread.fromObject(bread2JSON);
-    const breads = [bread1, bread2];
-    setBreadUUIDs([bread1.uuid, bread2.uuid]);
+    const bread3 = Bread.fromObject(bread3JSON);
+    const breads = [bread1, bread2, bread3];
+    setBreadUUIDs([bread1.uuid, bread2.uuid, bread3.uuid]);
     breads.forEach((bread) =>
       localStorage.setItem(bread.uuid.toString(), JSON.stringify(bread))
     );

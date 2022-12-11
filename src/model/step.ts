@@ -35,6 +35,7 @@ export class Step {
   constructor(
     public readonly name: string,
     public readonly autostart: boolean, // does this step start automatically when the previous step is completed
+    public readonly description?: string,
     public readonly startedAt?: Date,
     public readonly completedAt?: Date,
     public readonly duration?: number // manual step iff. undefined
@@ -44,6 +45,7 @@ export class Step {
     return new Step(
       obj.name,
       toBoolean(obj.autostart),
+      obj.description,
       toDateOrUndefined(obj.startedAt),
       toDateOrUndefined(obj.completedAt),
       toNumberOrUndefined(obj.duration)

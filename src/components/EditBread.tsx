@@ -28,6 +28,12 @@ function EditStep(props: {
     });
     props.onPropertyChange(newStep);
   };
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newStep = produce(props.step, (draft) => {
+      draft.description = e.target.value;
+    });
+    props.onPropertyChange(newStep);
+  };
   const handleAutostartChange = (
     _e: React.ChangeEvent<HTMLInputElement>,
     checked: boolean
@@ -91,7 +97,7 @@ function EditStep(props: {
       <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
         <Stack direction={"row"} width="100%">
           <TextField
-            label="Step Description"
+            label="Step Name"
             sx={{ lineHeight: 1, mt: "0.5rem", mb: "0.5rem" }}
             value={props.step.name}
             onChange={handleNameChange}
@@ -103,6 +109,14 @@ function EditStep(props: {
             onClick={() => props.onDelete()}
           />
         </Stack>
+        <Box>
+          <TextField
+            label="Step Description"
+            multiline
+            value={props.step.description}
+            onChange={handleDescriptionChange}
+          />
+        </Box>
         <Box>
           Autostart
           <Checkbox
@@ -142,7 +156,7 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
       draft[index] = newStep;
     });
     setSteps(newSteps);
-    props.onChange(steps);
+    props.onChange(newSteps);
   };
   const handleMoveUp = (index: number) => {
     if (index > 0) {
@@ -204,7 +218,6 @@ export function EditBread() {
   const uuid: number | undefined = params.uuid
     ? (params.uuid as unknown as number)
     : undefined;
-  console.log("edit uuid " + uuid);
   const navigate = useNavigate();
   const navigationIcon = (
     <IconButton

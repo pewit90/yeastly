@@ -1,0 +1,54 @@
+{
+  "uuid": 3,
+  "name": "Bubble Boy",
+  "createdTimestamp": "2022-08-20T09:30:00.000Z",
+  "steps": [
+    {
+      "name": "Autolyse & Poolish",
+      "description": "Autolyse 400g flour + 300ml water + 13g salt.\nPoolish 150g flour + 150g water + pinch of yeast.\nLet sit both over night.",
+      "autostart": false,
+      "duration": 720
+    },
+    {
+      "name": "Mix in Poolish",
+      "autostart": true
+    },
+    {
+      "name": "After 30min Coil-Fold 1",
+      "autostart": true,
+      "duration": 30
+    },
+    {
+      "name": "After 30min Coil-Fold 2",
+      "autostart": true,
+      "duration": 30
+    },
+    {
+      "name": "After 30min Coil-Fold 3",
+      "autostart": true,
+      "duration": 30
+    },
+    {
+      "name": "After 30min Coil-Fold 4",
+      "autostart": true,
+      "duration": 30
+    },
+    {
+      "name": "Proof at Room Temp",
+      "autostart": true,
+      "duration": 120
+    },
+    {
+      "name": "Bake Closed",
+      "description": "Bake in pre-heated dutch overn for 15min at 250° C",
+      "autostart": false,
+      "duration": 15
+    },
+    {
+      "name": "Bake Open",
+      "description": "Remove lid and bake for another 10min at 230° C",
+      "autostart": true,
+      "duration": 10
+    }
+  ]
+}
