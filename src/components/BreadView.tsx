@@ -46,6 +46,16 @@ function remainingDuration(step: Step): Duration | null {
   }
 }
 
+function stepDuration(step: Step): Duration | null {
+  if (!step.startedAt || !step.completedAt) {
+    return null;
+  }
+  return intervalToDuration({
+    start: step.startedAt,
+    end: step.completedAt,
+  });
+}
+
 function formatDuration(duration: Duration | null): string | null {
   if (!duration) {
     return null;
@@ -106,9 +116,7 @@ function CompletedStep(props: { step: Step; isLast: Boolean }) {
           fontWeight: "bold",
           textAlign: "right",
         }}
-      >
-        <Box sx={{ color: "gray" }}>3h 12m</Box>
-      </Box>
+      ></Box>
       <Box
         sx={{
           flex: 0,
@@ -138,6 +146,9 @@ function CompletedStep(props: { step: Step; isLast: Boolean }) {
         >
           {props.step.name}
         </Typography>
+        <Box sx={{ color: "gray" }}>
+          {formatDuration(stepDuration(props.step))}
+        </Box>
       </Box>
     </Box>
   );
