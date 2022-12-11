@@ -1,5 +1,6 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CircleIcon from "@mui/icons-material/Circle";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
@@ -69,6 +70,8 @@ function formatDuration(duration: Duration | null): string | null {
 function StepView({
   step,
   isCurrent,
+  isFirst,
+  isLast,
   onStart,
   onContinue,
   onReset,
@@ -78,6 +81,8 @@ function StepView({
     return (
       <CurrentStep
         step={step}
+        isLast={isLast}
+        isFirst={isFirst}
         onStart={onStart}
         onContinue={onContinue}
         onReset={onReset}
@@ -85,13 +90,13 @@ function StepView({
       />
     );
   } else if (step.state === StepState.COMPLETED) {
-    return <CompletedStep step={step} />;
+    return <CompletedStep step={step} isLast={isLast} />;
   } else {
-    return <PendingStep step={step} />;
+    return <PendingStep step={step} isLast={isLast} />;
   }
 }
 
-function CompletedStep(props: { step: Step }) {
+function CompletedStep(props: { step: Step; isLast: Boolean }) {
   return (
     <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
       <Box
@@ -115,10 +120,12 @@ function CompletedStep(props: { step: Step }) {
         }}
       >
         <CheckCircleIcon color="primary" fontSize="large" />
-        <Box
-          component="span"
-          sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
-        ></Box>
+        {!props.isLast && (
+          <Box
+            component="span"
+            sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
+          ></Box>
+        )}
       </Box>
       <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
         <Typography
@@ -136,7 +143,7 @@ function CompletedStep(props: { step: Step }) {
   );
 }
 
-function PendingStep(props: { step: Step }) {
+function PendingStep(props: { step: Step; isLast: Boolean }) {
   return (
     <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
       <Box
@@ -157,11 +164,13 @@ function PendingStep(props: { step: Step }) {
           alignItems: "center",
         }}
       >
-        <RadioButtonUncheckedIcon color="primary" />
-        <Box
-          component="span"
-          sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
-        ></Box>
+        <RadioButtonUncheckedIcon color="primary" fontSize="large" />
+        {!props.isLast && (
+          <Box
+            component="span"
+            sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
+          ></Box>
+        )}
       </Box>
       <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
         <Typography
@@ -181,6 +190,8 @@ function PendingStep(props: { step: Step }) {
 
 function CurrentStep(props: {
   step: Step;
+  isFirst: Boolean;
+  isLast: Boolean;
   onStart: () => void;
   onContinue: () => void;
   onReset: () => void;
@@ -217,12 +228,14 @@ function CurrentStep(props: {
           onReset={
             props.step.state === StepState.STARTED ? props.onReset : undefined
           }
-          onResumePrevious={props.onResumePrevious}
+          onResumePrevious={!props.isFirst ? props.onResumePrevious : undefined}
         />
-        <Box
-          component="span"
-          sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
-        ></Box>
+        {!props.isLast && (
+          <Box
+            component="span"
+            sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
+          ></Box>
+        )}
       </Box>
       <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
         <Typography
@@ -268,7 +281,7 @@ function StepControls(props: {
   } else if (props.state === StepState.STARTED) {
     return (
       <Button variant="contained" onClick={props.onContinue}>
-        Continue
+        Complete
       </Button>
     );
   } else {
@@ -362,7 +375,9 @@ export function BreadView() {
   const handleReset = () => {
     updateBread((bread) => bread.reset());
   };
-  const handleResumePrevious = () => {};
+  const handleResumePrevious = () => {
+    updateBread((bread) => bread.resumePreviousStep());
+  };
   const handleStartStep = () => {
     updateBread((bread) => bread.startStep());
   };
