@@ -19,7 +19,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step, StepState } from "../model/step";
 import { getBread, storeBread } from "../model/store";
-import { Page } from "./Page";
+import { Page } from "./common/Page";
+import { ProgressStepperElement } from "./common/ProgressStepperElement";
 
 export interface StepViewProps {
   step: Step;
@@ -107,96 +108,51 @@ function StepView({
 }
 
 function CompletedStep(props: { step: Step; isLast: Boolean }) {
-  return (
-    <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
-      <Box
+  const icon = <CheckCircleIcon color="primary" fontSize="large" />;
+  const right = (
+    <>
+      {" "}
+      <Typography
+        variant="h6"
         sx={{
-          mt: "0.45rem",
-          width: "5rem",
-          fontWeight: "bold",
-          textAlign: "right",
-        }}
-      ></Box>
-      <Box
-        sx={{
-          flex: 0,
-          minWidth: "3rem",
-          minHeight: "4rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          lineHeight: 1,
+          mt: "0.5rem",
+          mb: "0.5rem",
         }}
       >
-        <CheckCircleIcon color="primary" fontSize="large" />
-        {!props.isLast && (
-          <Box
-            component="span"
-            sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
-          ></Box>
-        )}
+        {props.step.name}
+      </Typography>
+      <Box sx={{ color: "gray" }}>
+        {formatDuration(stepDuration(props.step))}
       </Box>
-      <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
-        <Typography
-          variant="h6"
-          sx={{
-            lineHeight: 1,
-            mt: "0.5rem",
-            mb: "0.5rem",
-          }}
-        >
-          {props.step.name}
-        </Typography>
-        <Box sx={{ color: "gray" }}>
-          {formatDuration(stepDuration(props.step))}
-        </Box>
-      </Box>
-    </Box>
+    </>
   );
+  return ProgressStepperElement({
+    icon: icon,
+    right: right,
+    isLast: props.isLast,
+  });
 }
 
 function PendingStep(props: { step: Step; isLast: Boolean }) {
-  return (
-    <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
-      <Box
-        sx={{
-          mt: "0.45rem",
-          width: "5rem",
-          fontWeight: "bold",
-          textAlign: "right",
-        }}
-      ></Box>
-      <Box
-        sx={{
-          flex: 0,
-          minWidth: "3rem",
-          minHeight: "4rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <RadioButtonUncheckedIcon color="primary" fontSize="large" />
-        {!props.isLast && (
-          <Box
-            component="span"
-            sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
-          ></Box>
-        )}
-      </Box>
-      <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
-        <Typography
-          variant="h6"
-          sx={{
-            lineHeight: 1,
-            mt: "0.5rem",
-            mb: "0.5rem",
-          }}
-        >
-          {props.step.name}
-        </Typography>
-      </Box>
-    </Box>
+  const icon = <RadioButtonUncheckedIcon color="primary" fontSize="large" />;
+  const right = (
+    <Typography
+      variant="h6"
+      sx={{
+        lineHeight: 1,
+        mt: "0.5rem",
+        mb: "0.5rem",
+      }}
+    >
+      {props.step.name}
+    </Typography>
   );
+  return ProgressStepperElement({
+    icon: icon,
+    right: right,
+    isLast: props.isLast,
+  });
 }
 
 function CurrentStep(props: {
@@ -208,76 +164,53 @@ function CurrentStep(props: {
   onReset: () => void;
   onResumePrevious: () => void;
 }) {
-  return (
-    <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
-      <Box
-        sx={{
-          mt: "0.5rem",
-          width: "5rem",
-          fontWeight: "bold",
-          textAlign: "right",
-        }}
-      >
-        <Box>
-          <RefreshContainer
-            content={() => (
-              <Box>{formatDuration(remainingDuration(props.step))}</Box>
-            )}
-          />
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          flex: 0,
-          minWidth: "3rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <StepMenu
-          onReset={
-            props.step.state === StepState.STARTED ? props.onReset : undefined
-          }
-          onResumePrevious={!props.isFirst ? props.onResumePrevious : undefined}
-        />
-        {!props.isLast && (
-          <Box
-            component="span"
-            sx={{ flex: "1", width: "1px", backgroundColor: "text.secondary" }}
-          ></Box>
+  const left = (
+    <Box>
+      <RefreshContainer
+        content={() => (
+          <Box>{formatDuration(remainingDuration(props.step))}</Box>
         )}
-      </Box>
-      <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
-        <Typography
-          variant="h6"
-          sx={{
-            lineHeight: 1,
-            mt: "0.7rem",
-            mb: "0.5rem",
-          }}
-        >
-          {props.step.name}
-        </Typography>
-        {props.step.description && (
-          <Typography>{props.step.description}</Typography>
-        )}
-        <Box
-          display="flex"
-          mt="1rem"
-          mb="2rem"
-          justifyContent="end"
-          gap="0.5rem"
-        >
-          <StepControls
-            state={props.step.state}
-            onStart={props.onStart}
-            onContinue={props.onContinue}
-          />
-        </Box>
-      </Box>
+      />
     </Box>
   );
+  const icon = (
+    <StepMenu
+      onReset={
+        props.step.state === StepState.STARTED ? props.onReset : undefined
+      }
+      onResumePrevious={!props.isFirst ? props.onResumePrevious : undefined}
+    />
+  );
+  const right = (
+    <>
+      <Typography
+        variant="h6"
+        sx={{
+          lineHeight: 1,
+          mt: "0.7rem",
+          mb: "0.5rem",
+        }}
+      >
+        {props.step.name}
+      </Typography>
+      {props.step.description && (
+        <Typography>{props.step.description}</Typography>
+      )}
+      <Box display="flex" mt="1rem" mb="2rem" justifyContent="end" gap="0.5rem">
+        <StepControls
+          state={props.step.state}
+          onStart={props.onStart}
+          onContinue={props.onContinue}
+        />
+      </Box>
+    </>
+  );
+  return ProgressStepperElement({
+    left: left,
+    icon: icon,
+    right: right,
+    isLast: props.isLast,
+  });
 }
 
 function StepControls(props: {

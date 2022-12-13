@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Bread } from "../model/bread";
-import { Page } from "./Page";
+import { Page } from "./common/Page";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteBread, getBreads } from "../model/store";
 import { useState } from "react";

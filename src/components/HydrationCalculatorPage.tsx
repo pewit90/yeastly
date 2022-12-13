@@ -1,4 +1,4 @@
-import { Page } from "./Page";
+import { Page } from "./common/Page";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Typography, FilledInput } from "@mui/material";
 import { Hydration } from "../model/hydration";

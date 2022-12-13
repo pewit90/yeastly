@@ -13,7 +13,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step } from "../model/step";
 import { getBread, storeBread } from "../model/store";
-import { Page } from "./Page";
+import { Page } from "./common/Page";
+import { ProgressStepperElement } from "./common/ProgressStepperElement";
 
 function EditStep(props: {
   step: Step;
@@ -58,89 +59,75 @@ function EditStep(props: {
     });
     props.onPropertyChange(newStep);
   };
-
-  return (
-    <Box sx={{ display: "flex", gap: "0.4rem", width: "100%" }}>
-      <Box sx={{ mt: "4rem", width: "3rem", fontWeight: "bold" }}>
-        <ArrowUpwardIcon
-          fontSize="large"
-          color="primary"
-          onClick={() => props.onMoveUp()}
-        />
-        <ArrowDownwardIcon
-          fontSize="large"
-          color="primary"
-          sx={{ mt: "0.5rem" }}
-          onClick={() => props.onMoveDown()}
-        />
-      </Box>
-      <Box
-        sx={{
-          flex: 0,
-          mt: "1rem",
-          mb: "-1rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <RadioButtonUncheckedIcon fontSize="large" color="primary" />
-        <Box
-          component="span"
-          sx={{
-            flex: "1",
-            width: "1px",
-            backgroundColor: "text.secondary",
-          }}
-        ></Box>
-      </Box>
-      <Box sx={{ flex: 1, paddingBottom: "0.2rem" }}>
-        <Stack direction={"row"} width="100%">
-          <TextField
-            label="Step Name"
-            sx={{ lineHeight: 1, mt: "0.5rem", mb: "0.5rem" }}
-            value={props.step.name}
-            onChange={handleNameChange}
-          />
-          <RemoveCircleIcon
-            sx={{ mt: "1rem" }}
-            fontSize="large"
-            color="secondary"
-            onClick={() => props.onDelete()}
-          />
-        </Stack>
-        <Box>
-          <TextField
-            label="Step Description"
-            multiline
-            value={props.step.description}
-            onChange={handleDescriptionChange}
-          />
-        </Box>
-        <Box>
-          Autostart
-          <Checkbox
-            checked={props.step.autostart}
-            onChange={handleAutostartChange}
-          />
-        </Box>
-        <Box>
-          Duration
-          <Checkbox
-            checked={props.step.duration !== undefined}
-            onChange={handleHasDurationChange}
-          />
-          {props.step.duration !== undefined && (
-            <TextField
-              type="number"
-              value={props.step.duration}
-              onChange={handleDurationChange}
-            />
-          )}
-        </Box>
-      </Box>
+  const left = (
+    <Box sx={{ mt: "4rem", width: "3rem", fontWeight: "bold" }}>
+      <ArrowUpwardIcon
+        fontSize="large"
+        color="primary"
+        onClick={() => props.onMoveUp()}
+      />
+      <ArrowDownwardIcon
+        fontSize="large"
+        color="primary"
+        sx={{ mt: "0.5rem" }}
+        onClick={() => props.onMoveDown()}
+      />
     </Box>
   );
+  const icon = <RadioButtonUncheckedIcon fontSize="large" color="primary" />;
+  const right = (
+    <>
+      <Stack direction={"row"} width="100%">
+        <TextField
+          label="Step Name"
+          sx={{ lineHeight: 1, mt: "0.5rem", mb: "0.5rem" }}
+          value={props.step.name}
+          onChange={handleNameChange}
+        />
+        <RemoveCircleIcon
+          sx={{ mt: "1rem" }}
+          fontSize="large"
+          color="secondary"
+          onClick={() => props.onDelete()}
+        />
+      </Stack>
+      <Box>
+        <TextField
+          label="Step Description"
+          multiline
+          value={props.step.description}
+          onChange={handleDescriptionChange}
+        />
+      </Box>
+      <Box>
+        Autostart
+        <Checkbox
+          checked={props.step.autostart}
+          onChange={handleAutostartChange}
+        />
+      </Box>
+      <Box>
+        Duration
+        <Checkbox
+          checked={props.step.duration !== undefined}
+          onChange={handleHasDurationChange}
+        />
+        {props.step.duration !== undefined && (
+          <TextField
+            type="number"
+            value={props.step.duration}
+            onChange={handleDurationChange}
+          />
+        )}
+      </Box>
+    </>
+  );
+  return ProgressStepperElement({
+    left: left,
+    icon: icon,
+    right: right,
+    isLast: false,
+  });
 }
 
 function EditSteps(props: { steps: Step[]; onChange: Function }) {
@@ -201,14 +188,16 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
           onDelete={() => handleStepDeletion(index)}
         />
       ))}
-      <Box sx={{ mt: "1rem", display: "flex", gap: "0.4rem", width: "100%" }}>
-        <Box sx={{ mt: "0.1rem", width: "3rem", fontWeight: "bold" }} />
-        <AddCircleIcon
-          fontSize="large"
-          color="secondary"
-          onClick={() => handleAddStep()}
-        />
-      </Box>
+      <ProgressStepperElement
+        icon={
+          <AddCircleIcon
+            fontSize="large"
+            color="secondary"
+            onClick={() => handleAddStep()}
+          />
+        }
+        isLast={true}
+      />
     </Box>
   );
 }
