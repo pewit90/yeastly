@@ -1,8 +1,8 @@
-import { Bread } from "./bread";
-import { Step } from "./step";
 import bread1JSON from "../testing/input/bread1.json";
 import bread2JSON from "../testing/input/bread2.json";
 import bread3JSON from "../testing/input/bread3.json";
+import { Bread } from "./bread";
+import { Step } from "./step";
 
 const BREAD_UUIDS = "bread_uuids";
 

@@ -1,18 +1,18 @@
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Fab,
+  IconButton,
   List,
   ListItem,
   ListItemText,
   Typography,
-  IconButton,
 } from "@mui/material";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bread } from "../model/bread";
-import { Page } from "./common/Page";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteBread, getBreads } from "../model/store";
-import { useState } from "react";
+import { Page } from "./common/Page";
 
 function BreadListItem(props: { bread: Bread; onChange: Function }) {
   const navigate = useNavigate();

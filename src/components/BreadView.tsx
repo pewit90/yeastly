@@ -1,6 +1,5 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CircleIcon from "@mui/icons-material/Circle";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
@@ -272,7 +271,7 @@ function StepMenu(props: {
 }
 
 function RefreshContainer(props: { content: () => JSX.Element }) {
-  const [n, setN] = useState(true);
+  const [, setN] = useState(true);
   useEffect(() => {
     setInterval(() => setN((old) => !old), 1000);
   }, []);
