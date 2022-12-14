@@ -6,6 +6,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import { Box, Checkbox, IconButton, TextField } from "@mui/material";
+import Input from "@mui/material/Input";
+import InputAdornment from "@mui/material/InputAdornment";
 import { Stack } from "@mui/system";
 import { produce } from "immer";
 import React, { useState } from "react";
@@ -15,6 +17,89 @@ import { Step } from "../model/step";
 import { getBread, storeBread } from "../model/store";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
+import { Duration } from "date-fns";
+import { minutesToHours } from "date-fns/esm";
+
+function DurationField(props: {
+  duration: number;
+  onDurationChange: Function;
+}) {
+  const [duration, setDuration] = useState({
+    days: Math.floor(minutesToHours(props.duration) / 24),
+    hours: minutesToHours(props.duration) % 24,
+    minutes: props.duration % 60,
+  } as Duration);
+  const handleChange = (newDuration: Duration) => {
+    setDuration(newDuration);
+    console.log("new duration " + JSON.stringify(newDuration));
+    const minutes =
+      (newDuration.days ?? 0) * 60 * 24 +
+      (newDuration.hours ?? 0) * 60 +
+      (newDuration.minutes ?? 0);
+
+    console.log("minutes " + minutes);
+    props.onDurationChange(minutes); // duration as number
+  };
+  const inputStyling = { width: "25%", ml: "1rem" };
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "flex-end",
+      }}
+    >
+      <Input
+        error={duration.days !== undefined && duration.days < 0}
+        value={duration.days}
+        sx={{ ...inputStyling, ml: 0 }}
+        type="number"
+        onChange={(e) => {
+          const newDuration: Duration = {
+            ...duration,
+            days: +e.target.value,
+          };
+          handleChange(newDuration);
+        }}
+        endAdornment={<InputAdornment position="end">d</InputAdornment>}
+      />
+      <Input
+        error={
+          duration.hours !== undefined &&
+          (duration.hours < 0 || duration.hours >= 24)
+        }
+        value={duration.hours}
+        sx={inputStyling}
+        type="number"
+        onChange={(e) => {
+          const newDuration: Duration = {
+            ...duration,
+            hours: +e.target.value,
+          };
+          handleChange(newDuration);
+        }}
+        endAdornment={<InputAdornment position="end">h</InputAdornment>}
+      />
+      <Input
+        error={
+          duration.minutes !== undefined &&
+          (duration.minutes < 0 || duration.minutes >= 60)
+        }
+        value={duration.minutes}
+        sx={inputStyling}
+        type="number"
+        onChange={(e) => {
+          const newDuration: Duration = {
+            ...duration,
+            minutes: +e.target.value,
+          };
+          handleChange(newDuration);
+        }}
+        endAdornment={<InputAdornment position="end">m</InputAdornment>}
+      />
+    </Box>
+  );
+}
 
 function EditStep(props: {
   step: Step;
@@ -44,9 +129,9 @@ function EditStep(props: {
     });
     props.onPropertyChange(newStep);
   };
-  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDurationChange = (newDuration: number) => {
     const newStep = produce(props.step, (draft) => {
-      draft.duration = +e.target.value;
+      draft.duration = newDuration;
     });
     props.onPropertyChange(newStep);
   };
@@ -77,9 +162,10 @@ function EditStep(props: {
   const icon = <RadioButtonUncheckedIcon fontSize="large" color="primary" />;
   const right = (
     <>
-      <Stack direction={"row"} width="100%">
+      <Box width={"100%"} display={"flex"} justifyContent={"space-between"}>
         <TextField
           label="Step Name"
+          fullWidth
           sx={{ lineHeight: 1, mt: "0.5rem", mb: "0.5rem" }}
           value={props.step.name}
           onChange={handleNameChange}
@@ -90,11 +176,12 @@ function EditStep(props: {
           color="secondary"
           onClick={() => props.onDelete()}
         />
-      </Stack>
+      </Box>
       <Box>
         <TextField
           label="Step Description"
           multiline
+          fullWidth
           value={props.step.description}
           onChange={handleDescriptionChange}
         />
@@ -106,18 +193,19 @@ function EditStep(props: {
           onChange={handleAutostartChange}
         />
       </Box>
-      <Box>
+      <Box width={"100%"} display={"flex"} alignItems={"center"}>
         Duration
         <Checkbox
           checked={props.step.duration !== undefined}
           onChange={handleHasDurationChange}
         />
         {props.step.duration !== undefined && (
-          <TextField
-            type="number"
-            value={props.step.duration}
-            onChange={handleDurationChange}
-          />
+          <>
+            <DurationField
+              duration={props.step.duration}
+              onDurationChange={handleDurationChange}
+            />
+          </>
         )}
       </Box>
     </>
