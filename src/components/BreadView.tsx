@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step, StepState } from "../model/step";
 import { getBread, storeBread } from "../model/store";
+import { minutesToDuration } from "../utils/conversion-utils";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
 
@@ -37,7 +38,7 @@ function remainingDuration(step: Step): Duration | null {
   if (step.duration === undefined) {
     return null;
   } else if (step.startedAt === undefined) {
-    return { minutes: step.duration };
+    return minutesToDuration(step.duration);
   } else {
     const endTime = addMinutes(step.startedAt, step.duration);
     return intervalToDuration({

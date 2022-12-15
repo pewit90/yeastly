@@ -18,7 +18,10 @@ import { getBread, storeBread } from "../model/store";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
 import { Duration } from "date-fns";
-import { minutesToHours } from "date-fns/esm";
+import {
+  durationToMinutes,
+  minutesToDuration,
+} from "../utils/conversion-utils";
 
 const leftProgressStepperWidth = "0.5rem";
 
@@ -26,20 +29,10 @@ function DurationField(props: {
   duration: number;
   onDurationChange: Function;
 }) {
-  const [duration, setDuration] = useState({
-    days: Math.floor(minutesToHours(props.duration) / 24),
-    hours: minutesToHours(props.duration) % 24,
-    minutes: props.duration % 60,
-  } as Duration);
+  const [duration, setDuration] = useState(minutesToDuration(props.duration));
   const handleChange = (newDuration: Duration) => {
     setDuration(newDuration);
-    console.log("new duration " + JSON.stringify(newDuration));
-    const minutes =
-      (newDuration.days ?? 0) * 60 * 24 +
-      (newDuration.hours ?? 0) * 60 +
-      (newDuration.minutes ?? 0);
-
-    console.log("minutes " + minutes);
+    const minutes = durationToMinutes(newDuration);
     props.onDurationChange(minutes); // duration as number
   };
   const inputStyling = { width: "25%", ml: "1rem" };
