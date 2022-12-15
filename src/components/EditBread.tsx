@@ -20,6 +20,8 @@ import { ProgressStepperElement } from "./common/ProgressStepperElement";
 import { Duration } from "date-fns";
 import { minutesToHours } from "date-fns/esm";
 
+const leftProgressStepperWidth = "0.5rem";
+
 function DurationField(props: {
   duration: number;
   onDurationChange: Function;
@@ -44,7 +46,8 @@ function DurationField(props: {
   return (
     <Box
       sx={{
-        width: "100%",
+        flex: 1,
+        minWidth: "9rem",
         display: "flex",
         justifyContent: "flex-end",
       }}
@@ -103,6 +106,7 @@ function DurationField(props: {
 
 function EditStep(props: {
   step: Step;
+  isFirst: Boolean;
   onPropertyChange: Function;
   onMoveUp: Function;
   onMoveDown: Function;
@@ -145,7 +149,15 @@ function EditStep(props: {
     props.onPropertyChange(newStep);
   };
   const left = (
-    <Box sx={{ mt: "4rem", width: "3rem", fontWeight: "bold" }}>
+    <Box
+      sx={{
+        width: "3rem",
+        fontWeight: "bold",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+      }}
+    >
       <ArrowUpwardIcon
         fontSize="large"
         color="primary"
@@ -161,7 +173,7 @@ function EditStep(props: {
   );
   const icon = <RadioButtonUncheckedIcon fontSize="large" color="primary" />;
   const right = (
-    <>
+    <Box mb="3rem">
       <Box width={"100%"} display={"flex"} justifyContent={"space-between"}>
         <TextField
           label="Step Name"
@@ -193,7 +205,12 @@ function EditStep(props: {
           onChange={handleAutostartChange}
         />
       </Box>
-      <Box width={"100%"} display={"flex"} alignItems={"center"}>
+      <Box
+        width={"100%"}
+        display={"flex"}
+        alignItems={"center"}
+        flexWrap="wrap"
+      >
         Duration
         <Checkbox
           checked={props.step.duration !== undefined}
@@ -208,13 +225,16 @@ function EditStep(props: {
           </>
         )}
       </Box>
-    </>
+    </Box>
   );
   return ProgressStepperElement({
     left: left,
+    leftWidth: leftProgressStepperWidth,
     icon: icon,
+    iconOffset: "1.1rem",
     right: right,
     isLast: false,
+    isFirst: props.isFirst,
   });
 }
 
@@ -267,6 +287,7 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
       {steps.map((step, index) => (
         <EditStep
           step={step}
+          isFirst={index === 0}
           key={"step_" + index}
           onPropertyChange={(newStep: Step) =>
             handleStepPropertyChange(newStep, index)
@@ -277,6 +298,7 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
         />
       ))}
       <ProgressStepperElement
+        leftWidth={leftProgressStepperWidth}
         icon={
           <AddCircleIcon
             fontSize="large"
@@ -285,6 +307,7 @@ function EditSteps(props: { steps: Step[]; onChange: Function }) {
           />
         }
         isLast={true}
+        isFirst={steps.length === 1}
       />
     </Box>
   );
@@ -303,7 +326,7 @@ export function EditBread() {
       color="inherit"
       aria-label="back"
       sx={{ mr: 2 }}
-      onClick={() => navigate("/")}
+      onClick={() => navigate(-1)}
     >
       <ArrowBackIcon />
     </IconButton>

@@ -21,6 +21,7 @@ import { getBread, storeBread } from "../model/store";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
 
+const leftProgressStepperWidth = "5rem";
 export interface StepViewProps {
   step: Step;
   isCurrent: boolean;
@@ -100,13 +101,17 @@ function StepView({
       />
     );
   } else if (step.state === StepState.COMPLETED) {
-    return <CompletedStep step={step} isLast={isLast} />;
+    return <CompletedStep step={step} isLast={isLast} isFirst={isFirst} />;
   } else {
-    return <PendingStep step={step} isLast={isLast} />;
+    return <PendingStep step={step} isLast={isLast} isFirst={isFirst} />;
   }
 }
 
-function CompletedStep(props: { step: Step; isLast: Boolean }) {
+function CompletedStep(props: {
+  step: Step;
+  isLast: Boolean;
+  isFirst: Boolean;
+}) {
   const icon = <CheckCircleIcon color="primary" fontSize="large" />;
   const right = (
     <>
@@ -127,13 +132,15 @@ function CompletedStep(props: { step: Step; isLast: Boolean }) {
     </>
   );
   return ProgressStepperElement({
+    leftWidth: leftProgressStepperWidth,
     icon: icon,
     right: right,
     isLast: props.isLast,
+    isFirst: props.isFirst,
   });
 }
 
-function PendingStep(props: { step: Step; isLast: Boolean }) {
+function PendingStep(props: { step: Step; isLast: Boolean; isFirst: Boolean }) {
   const icon = <RadioButtonUncheckedIcon color="primary" fontSize="large" />;
   const right = (
     <Typography
@@ -148,9 +155,11 @@ function PendingStep(props: { step: Step; isLast: Boolean }) {
     </Typography>
   );
   return ProgressStepperElement({
+    leftWidth: leftProgressStepperWidth,
     icon: icon,
     right: right,
     isLast: props.isLast,
+    isFirst: props.isFirst,
   });
 }
 
@@ -164,10 +173,12 @@ function CurrentStep(props: {
   onResumePrevious: () => void;
 }) {
   const left = (
-    <Box>
+    <Box mt="0.5rem">
       <RefreshContainer
         content={() => (
-          <Box>{formatDuration(remainingDuration(props.step))}</Box>
+          <Box fontWeight="bold" textAlign="right">
+            {formatDuration(remainingDuration(props.step))}
+          </Box>
         )}
       />
     </Box>
@@ -182,33 +193,46 @@ function CurrentStep(props: {
   );
   const right = (
     <>
-      <Typography
-        variant="h6"
-        sx={{
-          lineHeight: 1,
-          mt: "0.7rem",
-          mb: "0.5rem",
-        }}
+      <Box
+        width={"100%"}
+        display={"flex"}
+        justifyContent={"space-between"}
+        flexWrap={"wrap"}
       >
-        {props.step.name}
-      </Typography>
-      {props.step.description && (
-        <Typography>{props.step.description}</Typography>
-      )}
-      <Box display="flex" mt="1rem" mb="2rem" justifyContent="end" gap="0.5rem">
-        <StepControls
-          state={props.step.state}
-          onStart={props.onStart}
-          onContinue={props.onContinue}
-        />
+        <Typography
+          variant="h6"
+          sx={{
+            lineHeight: 1,
+            mt: "0.7rem",
+            mb: "0.5rem",
+          }}
+        >
+          {props.step.name}
+        </Typography>
+        <Box justifyContent="end" gap="0.5rem">
+          <StepControls
+            state={props.step.state}
+            onStart={props.onStart}
+            onContinue={props.onContinue}
+          />
+        </Box>
+      </Box>
+      <Box display="flex" width={"100%"}>
+        {props.step.description && (
+          <Typography flex={1} variant="body2">
+            {props.step.description}
+          </Typography>
+        )}
       </Box>
     </>
   );
   return ProgressStepperElement({
     left: left,
+    leftWidth: leftProgressStepperWidth,
     icon: icon,
     right: right,
     isLast: props.isLast,
+    isFirst: props.isFirst,
   });
 }
 
