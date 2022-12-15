@@ -356,6 +356,11 @@ export function BreadView() {
       navigationIcon={navigationIcon}
       fabButton={editIcon}
     >
+      {bread.description && (
+        <Typography variant="subtitle1" my="2rem">
+          {bread.description}
+        </Typography>
+      )}
       <Box mt="1rem">
         {bread.steps.map((step: Step, index) => (
           <StepView

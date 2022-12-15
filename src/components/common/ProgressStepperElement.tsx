@@ -3,7 +3,7 @@ import { ReactElement } from "react";
 
 export function ProgressStepperElement(props: {
   left?: ReactElement;
-  leftWidth: string; // left should have a minWidth to ensure center lines are all aligned
+  leftWidth: string; // left should have a fixed width to ensure center lines are all aligned
   icon: ReactElement;
   iconOffset?: string;
   right?: ReactElement;

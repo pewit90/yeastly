@@ -27,7 +27,8 @@ export class Bread {
     public readonly uuid: number,
     public readonly name: string,
     public readonly steps: Step[],
-    public readonly createdTimestamp: Date
+    public readonly createdTimestamp: Date,
+    public readonly description?: string
   ) {}
 
   static fromObject(obj: any): Bread {
@@ -35,7 +36,8 @@ export class Bread {
       obj.uuid as number,
       obj.name,
       obj.steps ? obj.steps.map((el: any) => Step.fromObject(el)) : [],
-      toDateOrUndefined(obj.createdTimestamp) ?? new Date() // TODO throw error if undefined
+      toDateOrUndefined(obj.createdTimestamp) ?? new Date(), // TODO throw error if undefined
+      obj.description
     );
   }
 

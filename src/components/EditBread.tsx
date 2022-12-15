@@ -189,7 +189,7 @@ function EditStep(props: {
           onClick={() => props.onDelete()}
         />
       </Box>
-      <Box>
+      <Box mt="0.5rem">
         <TextField
           label="Step Description"
           multiline
@@ -348,6 +348,12 @@ export function EditBread() {
     });
     setBread(newBread);
   };
+  const handleBreadDescriptionChange = (description: string) => {
+    const newBread = produce(bread, (draft) => {
+      draft.description = description;
+    });
+    setBread(newBread);
+  };
   return (
     <Page title="Edit Bread" navigationIcon={navigationIcon}>
       <Stack padding={5}>
@@ -355,6 +361,14 @@ export function EditBread() {
           label="Name"
           value={bread.name}
           onChange={(e) => handleBreadNameChange(e.target.value)}
+        />
+        <TextField
+          label="Description"
+          multiline
+          fullWidth
+          value={bread.description}
+          onChange={(e) => handleBreadDescriptionChange(e.target.value)}
+          sx={{ mt: "1rem" }}
         />
         <EditSteps
           steps={bread.steps}
