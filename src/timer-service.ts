@@ -1,40 +1,46 @@
-import { addSeconds } from "date-fns";
-import { redirect, useNavigate } from "react-router-dom";
+import { addMinutes } from "date-fns";
 import { Bread } from "./model/bread";
 import { StepState } from "./model/step";
+import { Timer } from "./model/timer";
 
-const notificationIndex: Record<number, NodeJS.Timeout> = {};
+const notificationIndex: Record<number, Timer> = {};
+
+export function hasPermission(): boolean {
+  return Notification.permission === "granted";
+}
+export function getTimers(): Timer[] {
+  return Object.values(notificationIndex);
+}
 
 export function clearNotification(breadUUID: number) {
-  const timeout = notificationIndex[breadUUID];
-  if (timeout) {
-    clearTimeout(timeout);
+  const timer = notificationIndex[breadUUID];
+  if (timer) {
+    timer.clear();
     delete notificationIndex[breadUUID];
   }
 }
 
-export function setupBreadNotification(bread: Bread): void {
+export function setupBreadTimer(bread: Bread): void {
   clearNotification(bread.uuid);
   const currentStep = bread.steps[bread.currentStepIndex];
   if (currentStep.state !== StepState.STARTED) {
     return;
   }
 
-  if (currentStep.duration !== undefined) {
-    registerNotification(
+  if (
+    currentStep.duration !== undefined &&
+    currentStep.startedAt !== undefined
+  ) {
+    registerTimer(
       bread.uuid,
-      // addMinutes(startedAt, currentStep.duration),
-      addSeconds(new Date(), 5),
+      addMinutes(currentStep.startedAt, currentStep.duration),
+      // addSeconds(new Date(), 5),
       `${bread.name}: ${currentStep.name}`
     );
   }
 }
 
-async function registerNotification(
-  breadUUID: number,
-  time: Date,
-  title: string
-) {
+async function registerTimer(breadUUID: number, dueDate: Date, title: string) {
   const permission = await Notification.requestPermission();
   if (permission !== "granted") {
     // TODO inform user of his bad choice
@@ -50,6 +56,6 @@ async function registerNotification(
       console.log("notification clicked for", breadUUID);
     };
     delete notificationIndex[breadUUID];
-  }, time.getTime() - Date.now());
-  notificationIndex[breadUUID] = timeout;
+  }, dueDate.getTime() - Date.now());
+  notificationIndex[breadUUID] = new Timer(breadUUID, timeout);
 }
