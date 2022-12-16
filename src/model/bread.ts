@@ -91,7 +91,8 @@ export class Bread {
     return produce(this, (nextBread) => {
       const currentStep = nextBread.steps[nextBread.currentStepIndex];
       if (currentStep.state === StepState.PENDING) {
-        currentStep.startedAt = new Date();
+        const startedAt = new Date();
+        currentStep.startedAt = startedAt;
       }
     });
   }
