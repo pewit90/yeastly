@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { formatDuration, remainingDuration, Step } from "../../model/step";
 
@@ -14,8 +15,10 @@ export function DurationView(props: { step: Step }) {
   return (
     <RefreshContainer
       content={() => (
-        <Box fontWeight="bold" textAlign="right">
-          {formatDuration(remainingDuration(props.step))}
+        <Box>
+          <Typography variant="body1" align="right">
+            {formatDuration(remainingDuration(props.step))}
+          </Typography>
         </Box>
       )}
     />

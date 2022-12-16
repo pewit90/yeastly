@@ -1,6 +1,7 @@
 import { addMinutes } from "date-fns";
 import { Bread } from "./model/bread";
 import { StepState } from "./model/step";
+import { getBreads } from "./model/store";
 import { Timer } from "./model/timer";
 
 const notificationIndex: Record<number, Timer> = {};
@@ -12,6 +13,18 @@ export function getTimers(): Timer[] {
   return Object.values(notificationIndex);
 }
 
+export async function debugRebuildTimers() {
+  console.log("Rebuilding timers");
+  for (const key in notificationIndex) {
+    delete notificationIndex[key];
+  }
+  const breads = getBreads();
+  for (const bread of breads) {
+    await setupBreadTimer(bread);
+  }
+  console.log("Timers, as per service: " + JSON.stringify(notificationIndex));
+}
+
 export function clearNotification(breadUUID: number) {
   const timer = notificationIndex[breadUUID];
   if (timer) {
@@ -20,9 +33,10 @@ export function clearNotification(breadUUID: number) {
   }
 }
 
-export function setupBreadTimer(bread: Bread): void {
+export async function setupBreadTimer(bread: Bread): Promise<void> {
   clearNotification(bread.uuid);
   const currentStep = bread.steps[bread.currentStepIndex];
+  console.log(JSON.stringify(currentStep));
   if (currentStep.state !== StepState.STARTED) {
     return;
   }
@@ -31,7 +45,7 @@ export function setupBreadTimer(bread: Bread): void {
     currentStep.duration !== undefined &&
     currentStep.startedAt !== undefined
   ) {
-    registerTimer(
+    await registerTimer(
       bread.uuid,
       addMinutes(currentStep.startedAt, currentStep.duration),
       // addSeconds(new Date(), 5),
@@ -41,6 +55,7 @@ export function setupBreadTimer(bread: Bread): void {
 }
 
 async function registerTimer(breadUUID: number, dueDate: Date, title: string) {
+  console.log("Registering timer for ", breadUUID);
   const permission = await Notification.requestPermission();
   if (permission !== "granted") {
     // TODO inform user of his bad choice
@@ -58,4 +73,5 @@ async function registerTimer(breadUUID: number, dueDate: Date, title: string) {
     delete notificationIndex[breadUUID];
   }, dueDate.getTime() - Date.now());
   notificationIndex[breadUUID] = new Timer(breadUUID, timeout);
+  console.log(JSON.stringify(notificationIndex));
 }

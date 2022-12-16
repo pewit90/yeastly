@@ -68,11 +68,11 @@ export function getBreads(): Bread[] {
   return Object.values(breadIndex);
 }
 
-export function storeBread(bread: Bread) {
+export async function storeBread(bread: Bread) {
   localStorage.setItem(bread.uuid.toString(), JSON.stringify(bread));
   breadIndex[bread.uuid] = bread;
   addBreadUUID(bread.uuid);
-  setupBreadTimer(bread);
+  await setupBreadTimer(bread);
 }
 
 export function deleteBread(uuid: number) {
