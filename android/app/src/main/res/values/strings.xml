@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">yeastly</string>
+    <string name="title_activity_main">yeastly</string>
+    <string name="package_name">li.yeast</string>
+    <string name="custom_url_scheme">li.yeast</string>
+</resources>
