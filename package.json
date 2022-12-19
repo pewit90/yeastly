@@ -5,6 +5,7 @@
   "dependencies": {
     "@capacitor/android": "^4.6.1",
     "@capacitor/core": "^4.6.1",
+    "@capacitor/local-notifications": "^4.1.4",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@fontsource/roboto": "^4.5.8",
@@ -20,6 +21,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build-all": "npm run build && cap sync",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint .",

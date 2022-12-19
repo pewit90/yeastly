@@ -1,4 +1,4 @@
-import { clearNotification, setupBreadTimer } from "../timer-service";
+import { setupBreadTimer } from "../timer-service";
 import bread1JSON from "../testing/input/bread1.json";
 import bread2JSON from "../testing/input/bread2.json";
 import bread3JSON from "../testing/input/bread3.json";
@@ -79,7 +79,6 @@ export function deleteBread(uuid: number) {
   deleteBreadUUID(uuid);
   localStorage.removeItem(uuid.toString());
   delete breadIndex[uuid];
-  clearNotification(uuid);
   console.info("Deleted " + uuid);
 }
 

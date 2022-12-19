@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { deleteBread, getBreads } from "../model/store";
 import { Page } from "./common/Page";
-import { TimersView } from "./TimersView";
 
 function BreadListItem(props: { bread: Bread; onChange: Function }) {
   const navigate = useNavigate();
@@ -82,7 +81,6 @@ export function BreadHistory() {
 
   return (
     <Page title="History" fabButton={newBreadButton}>
-      <TimersView />
       {breadList}
     </Page>
   );
