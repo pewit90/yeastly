@@ -1,5 +1,6 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
-import { addSeconds, addMinutes } from "date-fns";
+import { addSeconds, addMinutes, differenceInSeconds } from "date-fns";
+import Alarm from "./capacitor/alarm-plugin";
 import { Bread } from "./model/bread";
 import { StepState } from "./model/step";
 import { getBread } from "./model/store";
@@ -42,17 +43,25 @@ async function registerTimer(breadUUID: number, dueDate: Date, title: string) {
   // TODO: verify input
   const bread = getBread(breadUUID);
   const currentStep = bread.steps[bread.currentStepIndex];
-  LocalNotifications.schedule({
-    notifications: [
-      {
-        id: breadUUID,
-        title: `${currentStep.name}`,
-        body: `${bread.name} is ready for the next step`,
-        schedule: {
-          at: dueDate,
-          allowWhileIdle: true,
-        },
-      },
-    ],
+
+  Alarm.setAlarm({
+    sec: differenceInSeconds(dueDate, new Date()),
+    sound: true,
+    title: `${currentStep.name}`,
+    text: `${bread.name} is ready for the next step`,
   });
+
+  // LocalNotifications.schedule({
+  //   notifications: [
+  //     {
+  //       id: breadUUID,
+  //       title: `${currentStep.name}`,
+  //       body: `${bread.name} is ready for the next step`,
+  //       schedule: {
+  //         at: dueDate,
+  //         allowWhileIdle: true,
+  //       },
+  //     },
+  //   ],
+  // });
 }
