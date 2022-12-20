@@ -1,7 +1,22 @@
-import { addMinutes } from "date-fns";
+import { LocalNotifications } from "@capacitor/local-notifications";
+import { addSeconds, addMinutes } from "date-fns";
 import { Bread } from "./model/bread";
 import { StepState } from "./model/step";
-import { LocalNotifications } from "@capacitor/local-notifications";
+import { getBread } from "./model/store";
+import { Timer } from "./model/timer";
+
+export async function getPendingTimers() {
+  const pending = await LocalNotifications.getPending();
+  const timers = pending.notifications.map(
+    (notificaction) => new Timer(notificaction.id, notificaction.schedule!.at!)
+  );
+  return timers;
+}
+
+export async function hasNotificationPermission() {
+  const permissionState = await LocalNotifications.checkPermissions();
+  return permissionState.display;
+}
 
 export async function setupBreadTimer(bread: Bread): Promise<void> {
   const currentStep = bread.steps[bread.currentStepIndex];
@@ -13,22 +28,30 @@ export async function setupBreadTimer(bread: Bread): Promise<void> {
     currentStep.duration !== undefined &&
     currentStep.startedAt !== undefined
   ) {
+    // const dueTime = addSeconds(currentStep.startedAt, 5);
+    const dueTime = addMinutes(currentStep.startedAt, currentStep.duration);
     await registerTimer(
       bread.uuid,
-      addMinutes(currentStep.startedAt, currentStep.duration),
+      dueTime,
       `${bread.name}: ${currentStep.name}`
     );
   }
 }
 
 async function registerTimer(breadUUID: number, dueDate: Date, title: string) {
-  console.log("Registering timer for ", breadUUID);
+  // TODO: verify input
+  const bread = getBread(breadUUID);
+  const currentStep = bread.steps[bread.currentStepIndex];
   LocalNotifications.schedule({
     notifications: [
       {
         id: breadUUID,
-        title: "Test Notificatoin",
-        body: "This is the notification",
+        title: `${currentStep.name}`,
+        body: `${bread.name} is ready for the next step`,
+        schedule: {
+          at: dueDate,
+          allowWhileIdle: true,
+        },
       },
     ],
   });

@@ -5,10 +5,6 @@ export class Timer {
 
   constructor(
     public readonly breadUUID: number,
-    private readonly timeout: NodeJS.Timeout
+    private readonly dueAt: Date
   ) {}
-
-  clear() {
-    clearTimeout(this.timeout);
-  }
 }
