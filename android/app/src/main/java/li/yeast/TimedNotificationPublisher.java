@@ -10,12 +10,13 @@ import android.os.PowerManager;
 
 /**
  * Class used to create notification from timer event
- * Note: Class is being registered in Android manifest as broadcast reciever
+ * Note: Class is being registered in Android manifest as broadcast receiver
  */
 public class TimedNotificationPublisher extends BroadcastReceiver {
     /**
      * Restore and present notification
      */
+    @Override
     public void onReceive(Context context, Intent intent) {
         showNotification(context, intent);
         monitorOnAtNotification(context);

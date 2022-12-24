@@ -53,15 +53,6 @@ public class AlarmPlugin extends Plugin {
     private NotificationChannel confNotificationChannelSound = configureNotificationChannel(true, ID_NOTIFICATION_CH_SOUND);
 
     @PluginMethod()
-    public void echo(PluginCall call) {
-        String value = call.getString("value");
-
-        JSObject ret = new JSObject();
-        ret.put("value", value);
-        call.resolve(ret);
-    }
-
-    @PluginMethod()
     public void setAlarm(PluginCall call) {
         if (getPermissionState(ALARM_PERMISSION) != PermissionState.GRANTED) {
             requestPermissionForAlias(ALARM_PERMISSION, call, "setAlarmCallback");
@@ -80,7 +71,6 @@ public class AlarmPlugin extends Plugin {
         this.activity = getActivity();
         this.context = getActivity();
 
-        Boolean setAlarmResult = false;
         Integer sec = call.getInt("sec");
         Boolean soundMode = call.getBoolean("sound", false);
         String notificationTitle = call.getString("title", "Alarm");
@@ -96,9 +86,9 @@ public class AlarmPlugin extends Plugin {
         }
         // set alarm
         setAlarmWithNotification(sec, notificationChannel, notificationTitle, notificationText);
-        setAlarmResult = true;
+
         JSObject json = new JSObject();
-        json.put("result", setAlarmResult);
+        json.put("result", true);
         call.success(json);
     }
 
