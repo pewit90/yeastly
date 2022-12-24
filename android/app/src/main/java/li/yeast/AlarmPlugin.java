@@ -44,13 +44,9 @@ public class AlarmPlugin extends Plugin {
 
     private Context context;
     private Activity activity;
-    private Integer requestCode = 1;
+    private static final Integer requestCode = 1;
+    private static final String NOTIFICATION_CHANNEL_ID = "ALARM_NOTIFICATIONS";
     public static final String NOTIFICATION_INTENT_KEY = "CAPACITOR_ALARM_NOTIFICATION";
-    // create notification channel
-    private final String ID_NOTIFICATION_CH_VIBRATION = "ID_NOTIFICATION_CH_VIBRATION";
-    private final String ID_NOTIFICATION_CH_SOUND = "ID_NOTIFICATION_CH_SOUND";
-    private NotificationChannel confNotificationChannelVibration = configureNotificationChannel(false, ID_NOTIFICATION_CH_VIBRATION);
-    private NotificationChannel confNotificationChannelSound = configureNotificationChannel(true, ID_NOTIFICATION_CH_SOUND);
 
     @PluginMethod()
     public void setAlarm(PluginCall call) {
@@ -72,99 +68,84 @@ public class AlarmPlugin extends Plugin {
         this.context = getActivity();
 
         Integer sec = call.getInt("sec");
-        Boolean soundMode = call.getBoolean("sound", false);
         String notificationTitle = call.getString("title", "Alarm");
         String notificationText = call.getString("text", "time up");
-        NotificationManager nManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this
-        nManager.createNotificationChannel(confNotificationChannelVibration);
-        nManager.createNotificationChannel(confNotificationChannelSound);
-        NotificationChannel notificationChannel = confNotificationChannelVibration;
-        if (soundMode) {
-            notificationChannel = confNotificationChannelSound;
-        }
-        // set alarm
-        setAlarmWithNotification(sec, notificationChannel, notificationTitle, notificationText);
+
+        setAlarmWithNotification(sec, notificationTitle, notificationText);
 
         JSObject json = new JSObject();
         json.put("result", true);
-        call.success(json);
+        call.resolve(json);
     }
 
-    private void setAlarmWithNotification(Integer sec, NotificationChannel channel, String title, String text) {
+    private void setAlarmWithNotification(Integer sec, String title, String text) {
+
+        Activity activity = getActivity();
+
         // create notification
-        Notification notification = createNotification(context, channel, title, text);
+        Notification notification = createNotification(title, text);
 
         // create notification intent from notification
-        Intent notificationIntent = new Intent(context, TimedNotificationPublisher.class);
+        Intent notificationIntent = new Intent(activity, TimedNotificationPublisher.class);
         notificationIntent.putExtra(NOTIFICATION_INTENT_KEY, notification);
-        PendingIntent notificationPendingIntent = PendingIntent.getBroadcast(context, requestCode, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent notificationPendingIntent = PendingIntent.getBroadcast(activity, requestCode, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         // clock intent is used when user touch clock icon
-        Intent clockIconIntent = new Intent(context, activity.getClass());
-        PendingIntent clockIconPendingIntent = PendingIntent.getActivity(context, requestCode, clockIconIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        Intent clockIconIntent = new Intent(activity, activity.getClass());
+        PendingIntent clockIconPendingIntent = PendingIntent.getActivity(activity, requestCode, clockIconIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
         Date currentTime = Calendar.getInstance().getTime();
-        long trigger = currentTime.getTime() + 1000 * sec;
+        long trigger = currentTime.getTime() + 1000L * sec;
         AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(trigger, clockIconPendingIntent);
         manager.setAlarmClock(alarmClockInfo, notificationPendingIntent);
     }
 
-    private NotificationChannel configureNotificationChannel(Boolean soundMode, String channelId) {
-        // user read this channel name in android setting.
-        String channelName = "Vibration Alarm";
-        if (soundMode) {
-            channelName = "Sound Alarm";
-        }
-
-        Integer importance = NotificationManager.IMPORTANCE_HIGH;
-        NotificationChannel notificationChannel = new NotificationChannel(
-                channelId,
-                channelName,
-                importance
-        );
-
-        // default no sound / vibration only
-        if (!soundMode) {
-            notificationChannel.setVibrationPattern(new long[]{0, 800, 800, 800, 800, 800, 800, 800});
-            notificationChannel.enableVibration(true);
-            notificationChannel.setSound(null, null);
-        } else {
-            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            AudioAttributes soundAttr = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build();
-            notificationChannel.setSound(soundUri, soundAttr);
-        }
-        notificationChannel.enableLights(true);
-        notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        return notificationChannel;
-    }
-
-    private Notification createNotification(Context context, NotificationChannel channel, String title, String text) {
-        Intent intent = buildIntent(context);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        Notification notification = new Notification.Builder(getContext(), channel.getId())
+    private Notification createNotification(String title, String text) {
+        Intent intent = buildIntent();
+        PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        NotificationChannel notificationChannel = getNotificationChannel();
+        return new Notification.Builder(getContext(), notificationChannel.getId())
                 .setContentTitle(title)
                 .setContentText(text)
-                .setAutoCancel(true)
+                .setAutoCancel(false)
                 .setOngoing(false)
                 .setSmallIcon(drawable.star_on)
-                .setChannelId(channel.getId())
                 .setContentIntent(pendingIntent)
+                .setFlag(Notification.FLAG_INSISTENT, true)
                 .build();
-        return notification;
     }
 
-    private Intent buildIntent(Context context) {
-        Intent intent = new Intent(context, activity.getClass());
+    private Intent buildIntent() {
+        Intent intent = new Intent(getActivity(), getActivity().getClass());
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return intent;
+    }
+
+    private NotificationChannel getNotificationChannel() {
+        NotificationChannel notificationChannel = new NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                "Alarms",
+                NotificationManager.IMPORTANCE_HIGH
+        );
+
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        AudioAttributes soundAttr = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build();
+        notificationChannel.setSound(soundUri, soundAttr);
+//        notificationChannel.setVibrationPattern(new long[]{0, 800, 800, 800, 800, 800, 800, 800});
+        notificationChannel.enableVibration(true);
+        notificationChannel.enableLights(true);
+        notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(notificationChannel );
+
+        return notificationChannel;
     }
 
 }
