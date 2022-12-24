@@ -13,7 +13,8 @@ import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PermissionState;
@@ -24,8 +25,11 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 
+import org.json.JSONStringer;
+
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 
 @CapacitorPlugin(
@@ -42,8 +46,6 @@ public class AlarmPlugin extends Plugin {
 
     public static final String ALARM_PERMISSION = "alarm";
 
-    private Context context;
-    private Activity activity;
     private static final Integer requestCode = 1;
     private static final String NOTIFICATION_CHANNEL_ID = "ALARM_NOTIFICATIONS";
     public static final String NOTIFICATION_INTENT_KEY = "CAPACITOR_ALARM_NOTIFICATION";
@@ -57,6 +59,14 @@ public class AlarmPlugin extends Plugin {
         }
     }
 
+    @PluginMethod()
+    public void cancelAlarm(PluginCall call) {
+        String alarmId = call.getString("alarmId");
+        AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        manager.cancel(createAlarmIntent(alarmId, null));
+        call.resolve();
+    }
+
     @PermissionCallback()
     public void setAlarmCallback(PluginCall call) {
         if (getPermissionState(ALARM_PERMISSION) != PermissionState.GRANTED) {
@@ -64,41 +74,37 @@ public class AlarmPlugin extends Plugin {
             return;
         }
 
-        this.activity = getActivity();
-        this.context = getActivity();
-
         Integer sec = call.getInt("sec");
         String notificationTitle = call.getString("title", "Alarm");
         String notificationText = call.getString("text", "time up");
 
-        setAlarmWithNotification(sec, notificationTitle, notificationText);
+        String identifier = scheduleAlarmWithNotification(sec, notificationTitle, notificationText);
 
         JSObject json = new JSObject();
-        json.put("result", true);
+        json.put("alarmId", identifier);
         call.resolve(json);
     }
 
-    private void setAlarmWithNotification(Integer sec, String title, String text) {
-
-        Activity activity = getActivity();
-
-        // create notification
+    private String scheduleAlarmWithNotification(Integer sec, String title, String text) {
         Notification notification = createNotification(title, text);
 
-        // create notification intent from notification
-        Intent notificationIntent = new Intent(activity, TimedNotificationPublisher.class);
-        notificationIntent.putExtra(NOTIFICATION_INTENT_KEY, notification);
-        PendingIntent notificationPendingIntent = PendingIntent.getBroadcast(activity, requestCode, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        String identifier = UUID.randomUUID().toString();
+        PendingIntent notificationPendingIntent = createAlarmIntent(identifier, notification);
 
-        // clock intent is used when user touch clock icon
-        Intent clockIconIntent = new Intent(activity, activity.getClass());
-        PendingIntent clockIconPendingIntent = PendingIntent.getActivity(activity, requestCode, clockIconIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         Date currentTime = Calendar.getInstance().getTime();
         long trigger = currentTime.getTime() + 1000L * sec;
-        AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(trigger, clockIconPendingIntent);
-        manager.setAlarmClock(alarmClockInfo, notificationPendingIntent);
+        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, notificationPendingIntent);
+
+        return identifier;
+    }
+
+    private PendingIntent createAlarmIntent(String identifier, @Nullable Notification notification) {
+        Activity activity = getActivity();
+        Intent notificationIntent = new Intent(activity, TimedNotificationPublisher.class);
+        notificationIntent.setIdentifier(identifier);
+        notificationIntent.putExtra(NOTIFICATION_INTENT_KEY, notification);
+        return PendingIntent.getBroadcast(activity, requestCode, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     private Notification createNotification(String title, String text) {
@@ -110,7 +116,7 @@ public class AlarmPlugin extends Plugin {
                 .setContentText(text)
                 .setAutoCancel(false)
                 .setOngoing(false)
-                .setSmallIcon(drawable.star_on)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
                 .setFlag(Notification.FLAG_INSISTENT, true)
                 .build();
@@ -137,13 +143,12 @@ public class AlarmPlugin extends Plugin {
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                 .build();
         notificationChannel.setSound(soundUri, soundAttr);
-//        notificationChannel.setVibrationPattern(new long[]{0, 800, 800, 800, 800, 800, 800, 800});
         notificationChannel.enableVibration(true);
         notificationChannel.enableLights(true);
         notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 
-        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(notificationChannel );
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(notificationChannel);
 
         return notificationChannel;
     }

@@ -44,7 +44,7 @@ async function registerTimer(breadUUID: number, dueDate: Date, title: string) {
   const bread = getBread(breadUUID);
   const currentStep = bread.steps[bread.currentStepIndex];
 
-  Alarm.setAlarm({
+  const { alarmId } = await Alarm.setAlarm({
     sec: differenceInSeconds(dueDate, new Date()),
     sound: true,
     title: `${currentStep.name}`,
