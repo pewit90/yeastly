@@ -1,23 +1,25 @@
 import { Box, Stack, Typography } from "@mui/material";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getBread } from "../model/store";
-import { Timer } from "../model/timer";
-import { getPendingTimers, hasNotificationPermission } from "../timer-service";
+import { Bread } from "../model/bread";
+import { getBreads } from "../model/store";
+import { hasNotificationPermission } from "../timer-service";
 import { DurationView } from "./common/DurationView";
 
-function TimerView(props: { timer: Timer }) {
+function TimerView(props: { bread: Bread }) {
   const navigate = useNavigate();
-  const bread = getBread(props.timer.breadUUID);
-  const currentStep = bread.steps[bread.currentStepIndex];
+  const currentStep = props.bread.currentStep;
+  if (currentStep === undefined) {
+    throw Error("bread has no current step");
+  }
+
   return (
     <Card
       variant="elevation"
       style={{ marginBottom: "1rem" }}
-      onClick={() => navigate("/" + bread.uuid)}
+      onClick={() => navigate("/" + props.bread.uuid)}
     >
       <CardContent>
         <Stack direction={"row"} spacing="2rem">
@@ -26,7 +28,7 @@ function TimerView(props: { timer: Timer }) {
           </Box>
           <Box>
             <Typography variant="h6">{currentStep.name}</Typography>
-            <Typography variant="caption">{bread.name}</Typography>
+            <Typography variant="caption">{props.bread.name}</Typography>
           </Box>
         </Stack>
       </CardContent>
@@ -34,32 +36,39 @@ function TimerView(props: { timer: Timer }) {
   );
 }
 
+function getBreadsWithTimers(): Bread[] {
+  return getBreads()
+    .filter((bread) => {
+      const currentStep = bread.currentStep;
+      return currentStep?.timer !== undefined;
+    })
+    .sort(
+      (a, b) =>
+        a.currentStep!.timer!.dueAt.getTime() -
+        b.currentStep!.timer!.dueAt.getTime()
+    );
+}
+
 export function TimersView() {
-  const [timers, setTimers] = useState([] as Timer[]);
+  const [breads] = useState(() => getBreadsWithTimers());
+  console.log("ReRender Timers View", breads);
   const [notificationPermissionStatus, setNotificationPermissionStatus] =
     useState("unknown");
 
-  const reloadValues = () => {
-    getPendingTimers().then((timers) => setTimers(timers));
-    hasNotificationPermission().then((permission) =>
-      setNotificationPermissionStatus(permission)
-    );
-  };
   useEffect(() => {
-    reloadValues();
+    hasNotificationPermission().then((permissionState) =>
+      setNotificationPermissionStatus(permissionState)
+    );
   }, []);
 
   return (
     <Box mt="1rem" flexDirection="column" padding={"1rem"}>
-      {timers.map((timer) => {
-        return <TimerView timer={timer} key={"timer_" + timer.breadUUID} />;
+      {breads.map((bread) => {
+        return <TimerView bread={bread} key={"timer_" + bread.uuid} />;
       })}
       <Typography variant="body2" align="right" my={"0.5rem"}>
         Has permission: {notificationPermissionStatus}
       </Typography>
-      <Button variant="contained" onClick={() => reloadValues()}>
-        Reload
-      </Button>
     </Box>
   );
 }

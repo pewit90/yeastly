@@ -67,6 +67,15 @@ public class AlarmPlugin extends Plugin {
         call.resolve();
     }
 
+
+    @PluginMethod()
+    public void hasRequiredPermissions(PluginCall call) {
+        PermissionState permissionState = getPermissionState(ALARM_PERMISSION);
+        JSObject result = new JSObject();
+        result.put("permissionState", permissionState.toString());
+        call.resolve(result);
+    }
+
     @PermissionCallback()
     public void setAlarmCallback(PluginCall call) {
         if (getPermissionState(ALARM_PERMISSION) != PermissionState.GRANTED) {
@@ -74,29 +83,21 @@ public class AlarmPlugin extends Plugin {
             return;
         }
 
-        Integer sec = call.getInt("sec");
-        String notificationTitle = call.getString("title", "Alarm");
-        String notificationText = call.getString("text", "time up");
+        long alarmTime = call.getLong("alarmTime");
+        String alarmId = call.getString("alarmId");
+        String notificationTitle = call.getString("title" );
+        String notificationText = call.getString("text");
 
-        String identifier = scheduleAlarmWithNotification(sec, notificationTitle, notificationText);
+        scheduleAlarmWithNotification(alarmId, alarmTime, notificationTitle, notificationText);
 
-        JSObject json = new JSObject();
-        json.put("alarmId", identifier);
-        call.resolve(json);
+        call.resolve();
     }
 
-    private String scheduleAlarmWithNotification(Integer sec, String title, String text) {
+    private void scheduleAlarmWithNotification(String identifier, long alarmTime, String title, String text) {
         Notification notification = createNotification(title, text);
-
-        String identifier = UUID.randomUUID().toString();
         PendingIntent notificationPendingIntent = createAlarmIntent(identifier, notification);
-
         AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-        Date currentTime = Calendar.getInstance().getTime();
-        long trigger = currentTime.getTime() + 1000L * sec;
-        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, notificationPendingIntent);
-
-        return identifier;
+        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTime, notificationPendingIntent);
     }
 
     private PendingIntent createAlarmIntent(String identifier, @Nullable Notification notification) {

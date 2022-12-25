@@ -6,27 +6,32 @@ export interface AlarmSetResult {
 
 export interface AlarmPlugin {
   setAlarm(options: {
-    sec: number;
-    sound: boolean;
+    alarmId: string;
+    alarmTime: number;
     title: string;
     text: string;
-  }): Promise<AlarmSetResult>;
+  }): Promise<void>;
   cancelAlarm(options: { alarmId: string }): void;
+  hasRequiredPermissions(): Promise<{ permissionState: string }>;
 }
 
 export class AlarmWeb extends WebPlugin implements AlarmPlugin {
   setAlarm(options: {
-    sec: number;
-    sound: boolean;
+    alarmId: string;
+    alarmTime: number;
     title: string;
     text: string;
-  }): Promise<AlarmSetResult> {
+  }): Promise<void> {
     console.log("Capacitor: setAlarm()", options);
-    return Promise.resolve({ alarmId: crypto.randomUUID() });
+    return Promise.resolve();
   }
 
   cancelAlarm(options: { alarmId: string }): void {
     console.log("Capacitor: cancelAlarm()", options);
+  }
+
+  hasRequiredPermissions(): Promise<{ permissionState: string }> {
+    return Promise.resolve({ permissionState: "granted" });
   }
 }
 

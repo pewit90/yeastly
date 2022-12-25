@@ -6,6 +6,7 @@ import {
   toDateOrUndefined,
   toNumberOrUndefined,
 } from "../utils/conversion-utils";
+import { Timer } from "./timer";
 
 export enum StepState {
   PENDING = "PENDING",
@@ -32,6 +33,10 @@ export class Step {
     } else {
       return StepState.PENDING;
     }
+  }
+
+  get timer(): Timer | undefined {
+    return Timer.fromStep(this);
   }
 
   constructor(
