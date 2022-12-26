@@ -23,6 +23,14 @@ export class Bread {
     return -1;
   }
 
+  get currentStep(): Step | undefined {
+    const currentStepIndex = this.currentStepIndex;
+    if (currentStepIndex < 0) {
+      return undefined;
+    }
+    return this.steps[currentStepIndex];
+  }
+
   constructor(
     public readonly uuid: number,
     public readonly name: string,
@@ -91,7 +99,8 @@ export class Bread {
     return produce(this, (nextBread) => {
       const currentStep = nextBread.steps[nextBread.currentStepIndex];
       if (currentStep.state === StepState.PENDING) {
-        currentStep.startedAt = new Date();
+        const startedAt = new Date();
+        currentStep.startedAt = startedAt;
       }
     });
   }

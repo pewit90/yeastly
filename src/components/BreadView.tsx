@@ -12,13 +12,12 @@ import {
   Typography,
 } from "@mui/material";
 import Fab from "@mui/material/Fab";
-import { addMinutes, intervalToDuration } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
-import { Step, StepState } from "../model/step";
+import { formatDuration, Step, stepDuration, StepState } from "../model/step";
 import { getBread, storeBread } from "../model/store";
-import { minutesToDuration } from "../utils/conversion-utils";
+import { DurationView } from "./common/DurationView";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
 
@@ -32,51 +31,6 @@ export interface StepViewProps {
   onContinue: () => void;
   onReset: () => void;
   onResumePrevious: () => void;
-}
-
-function remainingDuration(step: Step): Duration | null {
-  if (step.duration === undefined) {
-    return null;
-  } else if (step.startedAt === undefined) {
-    return minutesToDuration(step.duration);
-  } else {
-    const endTime = addMinutes(step.startedAt, step.duration);
-    return intervalToDuration({
-      start: new Date(),
-      end: endTime,
-    });
-  }
-}
-
-function stepDuration(step: Step): Duration | null {
-  if (!step.startedAt || !step.completedAt) {
-    return null;
-  }
-  return intervalToDuration({
-    start: step.startedAt,
-    end: step.completedAt,
-  });
-}
-
-function formatDuration(duration: Duration | null): string | null {
-  if (!duration) {
-    return null;
-  }
-
-  if (Math.abs((duration.months ?? 0) + (duration.years ?? 0)) > 0) {
-    return "long";
-  }
-
-  if (Math.abs(duration.days ?? 0) > 0) {
-    return `${duration.days ?? 0}d ${duration.hours ?? 0}h`;
-  }
-
-  if (Math.abs(duration.hours ?? 0) > 0) {
-    return `${duration.hours ?? 0}h ${duration.minutes ?? 0}m`;
-  }
-
-  const formatZero = (n: number) => (n < 10 ? "0" + n : "" + n);
-  return `${duration.minutes ?? 0}m ${formatZero(duration.seconds ?? 0)}s`;
 }
 
 function StepView({
@@ -175,13 +129,7 @@ function CurrentStep(props: {
 }) {
   const left = (
     <Box mt="0.5rem">
-      <RefreshContainer
-        content={() => (
-          <Box fontWeight="bold" textAlign="right">
-            {formatDuration(remainingDuration(props.step))}
-          </Box>
-        )}
-      />
+      <DurationView step={props.step} />
     </Box>
   );
   const icon = (
@@ -293,14 +241,6 @@ function StepMenu(props: {
       </Menu>
     </>
   );
-}
-
-function RefreshContainer(props: { content: () => JSX.Element }) {
-  const [, setN] = useState(true);
-  useEffect(() => {
-    setInterval(() => setN((old) => !old), 1000);
-  }, []);
-  return <>{props.content()}</>;
 }
 
 export function BreadView() {

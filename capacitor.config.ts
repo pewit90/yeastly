@@ -1,10 +1,13 @@
-import { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'li.yeast',
-  appName: 'yeastly',
-  webDir: 'build',
-  bundledWebRuntime: false
+  appId: "li.yeast",
+  appName: "yeastly",
+  webDir: "build",
+  bundledWebRuntime: false,
+  plugins: {
+    LocalNotifications: {},
+  },
 };
 
 export default config;

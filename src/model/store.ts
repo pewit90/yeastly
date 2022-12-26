@@ -1,3 +1,4 @@
+import { clearTimer, setupTimer } from "../timer-service";
 import bread1JSON from "../testing/input/bread1.json";
 import bread2JSON from "../testing/input/bread2.json";
 import bread3JSON from "../testing/input/bread3.json";
@@ -67,13 +68,16 @@ export function getBreads(): Bread[] {
   return Object.values(breadIndex);
 }
 
-export function storeBread(bread: Bread) {
+export async function storeBread(bread: Bread) {
   localStorage.setItem(bread.uuid.toString(), JSON.stringify(bread));
   breadIndex[bread.uuid] = bread;
   addBreadUUID(bread.uuid);
+  await clearTimer(bread.uuid);
+  await setupTimer(bread);
 }
 
 export function deleteBread(uuid: number) {
+  clearTimer(uuid);
   deleteBreadUUID(uuid);
   localStorage.removeItem(uuid.toString());
   delete breadIndex[uuid];
