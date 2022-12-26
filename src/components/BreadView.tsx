@@ -1,16 +1,8 @@
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import {
-  Box,
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import Fab from "@mui/material/Fab";
 import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -249,30 +241,6 @@ export function BreadView() {
   const [bread, setBread] = useState(() => getBread(uuid));
   const navigate = useNavigate();
 
-  const navigationIcon = (
-    <IconButton
-      size="large"
-      edge="start"
-      color="inherit"
-      aria-label="back"
-      sx={{ mr: 2 }}
-      onClick={() => navigate("/")}
-    >
-      <ArrowBackIcon />
-    </IconButton>
-  );
-  const editIcon = (
-    <Fab
-      color="secondary"
-      aria-label="edit"
-      onClick={() => {
-        navigate("/edit/" + uuid);
-      }}
-    >
-      <ModeEditIcon />
-    </Fab>
-  );
-
   const updateBread = (mutate: (bread: Bread) => Bread) => {
     const nextBread = mutate(bread);
     storeBread(nextBread);
@@ -292,11 +260,7 @@ export function BreadView() {
     updateBread((bread) => bread.startStep());
   };
   return (
-    <Page
-      title={bread.name}
-      navigationIcon={navigationIcon}
-      fabButton={editIcon}
-    >
+    <Page title={bread.name}>
       {bread.description && (
         <Typography variant="subtitle1" my="2rem">
           {bread.description}
@@ -317,6 +281,16 @@ export function BreadView() {
           />
         ))}
       </Box>
+      <Fab
+        color="secondary"
+        aria-label="edit"
+        sx={{ position: "fixed", bottom: "2rem", right: "2rem" }}
+        onClick={() => {
+          navigate("/edit/" + uuid);
+        }}
+      >
+        <ModeEditIcon />
+      </Fab>
     </Page>
   );
 }

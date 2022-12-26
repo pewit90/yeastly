@@ -68,22 +68,22 @@ export function BreadHistory() {
       }}
     />
   );
-  const newBreadButton = (
-    <Fab
-      color="secondary"
-      aria-label="add"
-      onClick={() => {
-        navigate("/edit");
-      }}
-    >
-      <AddIcon />
-    </Fab>
-  );
 
   return (
-    <Page title="History" fabButton={newBreadButton}>
+    <Page title="History">
       <TimersView />
       {breadList}
+
+      <Fab
+        color="secondary"
+        aria-label="add"
+        sx={{ position: "fixed", bottom: "2rem", right: "2rem" }}
+        onClick={() => {
+          navigate("/edit");
+        }}
+      >
+        <AddIcon />
+      </Fab>
     </Page>
   );
 }

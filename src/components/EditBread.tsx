@@ -1,5 +1,4 @@
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -9,19 +8,19 @@ import { Box, Checkbox, IconButton, TextField } from "@mui/material";
 import Input from "@mui/material/Input";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Stack } from "@mui/system";
+import { Duration } from "date-fns";
 import { produce } from "immer";
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step } from "../model/step";
 import { getBread, storeBread } from "../model/store";
-import { Page } from "./common/Page";
-import { ProgressStepperElement } from "./common/ProgressStepperElement";
-import { Duration } from "date-fns";
 import {
   durationToMinutes,
   minutesToDuration,
 } from "../utils/conversion-utils";
+import { Page } from "./common/Page";
+import { ProgressStepperElement } from "./common/ProgressStepperElement";
 
 const leftProgressStepperWidth = "0.5rem";
 
@@ -312,18 +311,6 @@ export function EditBread() {
     ? (params.uuid as unknown as number)
     : undefined;
   const navigate = useNavigate();
-  const navigationIcon = (
-    <IconButton
-      size="large"
-      edge="start"
-      color="inherit"
-      aria-label="back"
-      sx={{ mr: 2 }}
-      onClick={() => navigate(-1)}
-    >
-      <ArrowBackIcon />
-    </IconButton>
-  );
   const timestamp = new Date();
   const [bread, setBread] = useState(
     uuid
@@ -348,7 +335,7 @@ export function EditBread() {
     setBread(newBread);
   };
   return (
-    <Page title="Edit Bread" navigationIcon={navigationIcon}>
+    <Page title="Edit Bread">
       <Stack padding={5}>
         <TextField
           label="Name"

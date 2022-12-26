@@ -113,7 +113,7 @@ export function formatDuration(
 }
 
 export function isStepOverdue(step: Step): boolean {
-  if (step.startedAt == undefined || step.duration === undefined) {
+  if (step.startedAt === undefined || step.duration === undefined) {
     return false;
   }
   const endTime = addMinutes(step.startedAt, step.duration);

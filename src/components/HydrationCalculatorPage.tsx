@@ -66,6 +66,7 @@ export function HydrationCalculator(props: { hydration?: Hydration }) {
   const [hydration, setHydration] = useState(
     props.hydration ?? new Hydration(1000, 80, 2)
   );
+
   return (
     <Page title="Hydration Calculator">
       <Grid container spacing={3} margin={3}>
