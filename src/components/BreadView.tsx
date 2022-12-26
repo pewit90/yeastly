@@ -160,8 +160,13 @@ function CurrentStep(props: {
       </Box>
       <Box display="flex" width={"100%"}>
         {props.step.description && (
-          <Typography flex={1} variant="body2">
-            {props.step.description}
+          <Typography flex={1} variant="body2" mt="0.5rem">
+            {props.step.description.split("\n").map((line) => (
+              <>
+                <span>{line}</span>
+                <br />
+              </>
+            ))}
           </Typography>
         )}
       </Box>
