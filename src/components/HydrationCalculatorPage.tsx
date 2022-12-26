@@ -1,4 +1,4 @@
-import { FilledInput, Typography } from "@mui/material";
+import { Box, FilledInput, Typography } from "@mui/material";
 import Input from "@mui/material/Input";
 import InputAdornment from "@mui/material/InputAdornment";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -12,19 +12,12 @@ function Label(props: { text: string }) {
 
 function NumberDisplayField(props: { value: number; unit: string }) {
   return (
-    // <Typography variant="h6" align="right">
-    //   {props.value + props.unit}
-    // </Typography>
-    <FilledInput
-      fullWidth
-      readOnly
-      value={props.value}
-      type="number"
-      unselectable="on"
-      endAdornment={
-        <InputAdornment position="end">{props.unit}</InputAdornment>
-      }
-    />
+    <Box display="flex" mt="0.3rem">
+      =
+      <Typography align="right" sx={{ flex: "1" }}>
+        {Math.round(props.value) + " " + props.unit}
+      </Typography>
+    </Box>
   );
 }
 
@@ -92,7 +85,6 @@ export function HydrationCalculator(props: { hydration?: Hydration }) {
           <Label text="Water" />
         </Grid>
         <Grid xs={4}>
-          {" "}
           <NumberInputField
             value={hydration.waterPercentage}
             unit="%"
@@ -114,7 +106,6 @@ export function HydrationCalculator(props: { hydration?: Hydration }) {
           <Label text="Salt" />
         </Grid>
         <Grid xs={4}>
-          {" "}
           <NumberInputField
             value={hydration.saltPercentage}
             unit="%"
