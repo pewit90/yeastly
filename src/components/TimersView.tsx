@@ -65,9 +65,9 @@ export function TimersView() {
       {breads.map((bread) => {
         return <TimerView bread={bread} key={"timer_" + bread.uuid} />;
       })}
-      <Typography variant="body2" align="right" my={"0.5rem"}>
+      {/* <Typography variant="body2" align="right" my={"0.5rem"}>
         Has permission: {notificationPermissionStatus}
-      </Typography>
+      </Typography> */}
     </Box>
   );
 }
