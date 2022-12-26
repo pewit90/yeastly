@@ -42,7 +42,7 @@ function BlinkContainer() {
     icon = <NotificationsIcon color="primary" />;
   }
   return (
-    <Box display="flex" justifyContent="center">
+    <Box display="flex" justifyContent="center" marginTop="0.2rem">
       {icon}
     </Box>
   );
