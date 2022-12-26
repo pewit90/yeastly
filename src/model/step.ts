@@ -84,23 +84,39 @@ export function stepDuration(step: Step): Duration | null {
   });
 }
 
-export function formatDuration(duration: Duration | null): string | null {
+export function formatDuration(
+  duration: Duration | null,
+  isNegative = false
+): string | null {
   if (!duration) {
     return null;
   }
+
+  const sign = isNegative ? "-" : "";
 
   if (Math.abs((duration.months ?? 0) + (duration.years ?? 0)) > 0) {
     return "long";
   }
 
   if (Math.abs(duration.days ?? 0) > 0) {
-    return `${duration.days ?? 0}d ${duration.hours ?? 0}h`;
+    return `${sign}${duration.days ?? 0}d ${duration.hours ?? 0}h`;
   }
 
   if (Math.abs(duration.hours ?? 0) > 0) {
-    return `${duration.hours ?? 0}h ${duration.minutes ?? 0}m`;
+    return `${sign}${duration.hours ?? 0}h ${duration.minutes ?? 0}m`;
   }
 
   const formatZero = (n: number) => (n < 10 ? "0" + n : "" + n);
-  return `${duration.minutes ?? 0}m ${formatZero(duration.seconds ?? 0)}s`;
+  return `${sign}${duration.minutes ?? 0}m ${formatZero(
+    duration.seconds ?? 0
+  )}s`;
+}
+
+export function isStepOverdue(step: Step): boolean {
+  if (step.startedAt == undefined || step.duration === undefined) {
+    return false;
+  }
+  const endTime = addMinutes(step.startedAt, step.duration);
+  const now = new Date();
+  return now >= endTime;
 }

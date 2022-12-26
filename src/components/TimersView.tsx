@@ -23,7 +23,7 @@ function TimerView(props: { bread: Bread }) {
     >
       <CardContent>
         <Stack direction={"row"} spacing="2rem">
-          <Box display="flex" alignItems="center">
+          <Box display="flex" alignItems="center" width="4.5rem">
             <DurationView step={currentStep} />
           </Box>
           <Box>
@@ -51,7 +51,6 @@ function getBreadsWithTimers(): Bread[] {
 
 export function TimersView() {
   const [breads] = useState(() => getBreadsWithTimers());
-  console.log("ReRender Timers View", breads);
   const [notificationPermissionStatus, setNotificationPermissionStatus] =
     useState("unknown");
 
