@@ -13,20 +13,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import Input from "@mui/material/Input";
-import InputAdornment from "@mui/material/InputAdornment";
 import { Stack } from "@mui/system";
-import { Duration, formatDuration } from "date-fns";
+import { formatDuration } from "date-fns";
 import { produce } from "immer";
 import React, { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step } from "../model/step";
 import { getBread, storeBread } from "../model/store";
-import {
-  durationToMinutes,
-  minutesToDuration,
-} from "../utils/conversion-utils";
+import { minutesToDuration } from "../utils/conversion-utils";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
 import { DurationEditor } from "./DurationEditor";
@@ -62,7 +57,7 @@ function NewDurationField(props: {
         onClose={() => setOpen(false)}
       >
         <DurationEditor
-          duration={duration}
+          initialDuration={duration}
           handleSave={(newValue) => {
             setDuration(newValue);
             props.onDurationChange(newValue);
@@ -70,78 +65,6 @@ function NewDurationField(props: {
           }}
         />
       </Popover>
-    </Box>
-  );
-}
-
-function DurationField(props: {
-  duration: number;
-  onDurationChange: Function;
-}) {
-  const [duration, setDuration] = useState(minutesToDuration(props.duration));
-  const handleChange = (newDuration: Duration) => {
-    setDuration(newDuration);
-    const minutes = durationToMinutes(newDuration);
-    props.onDurationChange(minutes); // duration as number
-  };
-  const inputStyling = { width: "25%", ml: "1rem" };
-  return (
-    <Box
-      sx={{
-        flex: 1,
-        minWidth: "9rem",
-        display: "flex",
-        justifyContent: "flex-end",
-      }}
-    >
-      <Input
-        error={duration.days !== undefined && duration.days < 0}
-        value={duration.days}
-        sx={{ ...inputStyling, ml: 0 }}
-        type="number"
-        onChange={(e) => {
-          const newDuration: Duration = {
-            ...duration,
-            days: +e.target.value,
-          };
-          handleChange(newDuration);
-        }}
-        endAdornment={<InputAdornment position="end">d</InputAdornment>}
-      />
-      <Input
-        error={
-          duration.hours !== undefined &&
-          (duration.hours < 0 || duration.hours >= 24)
-        }
-        value={duration.hours}
-        sx={inputStyling}
-        type="number"
-        onChange={(e) => {
-          const newDuration: Duration = {
-            ...duration,
-            hours: +e.target.value,
-          };
-          handleChange(newDuration);
-        }}
-        endAdornment={<InputAdornment position="end">h</InputAdornment>}
-      />
-      <Input
-        error={
-          duration.minutes !== undefined &&
-          (duration.minutes < 0 || duration.minutes >= 60)
-        }
-        value={duration.minutes}
-        sx={inputStyling}
-        type="number"
-        onChange={(e) => {
-          const newDuration: Duration = {
-            ...duration,
-            minutes: +e.target.value,
-          };
-          handleChange(newDuration);
-        }}
-        endAdornment={<InputAdornment position="end">m</InputAdornment>}
-      />
     </Box>
   );
 }
