@@ -2,15 +2,23 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import EditIcon from "@mui/icons-material/Edit";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import { Box, Checkbox, IconButton, TextField } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  IconButton,
+  Popover,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Input from "@mui/material/Input";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Stack } from "@mui/system";
-import { Duration } from "date-fns";
+import { Duration, formatDuration } from "date-fns";
 import { produce } from "immer";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step } from "../model/step";
@@ -21,8 +29,50 @@ import {
 } from "../utils/conversion-utils";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
+import { DurationEditor } from "./DurationEditor";
 
 const leftProgressStepperWidth = "0.5rem";
+
+function NewDurationField(props: {
+  duration: number;
+  onDurationChange: Function;
+}) {
+  const [duration, setDuration] = useState(props.duration);
+  const editIconRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <Box
+      sx={{
+        flex: 1,
+        minWidth: "9rem",
+        display: "flex",
+        justifyContent: "flex-end",
+      }}
+    >
+      <Typography>
+        {formatDuration(minutesToDuration(props.duration))}
+      </Typography>
+      <IconButton ref={editIconRef} onClick={() => setOpen(true)}>
+        <EditIcon />
+      </IconButton>
+      <Popover
+        id="duration-popover"
+        open={open}
+        anchorEl={editIconRef.current}
+        onClose={() => setOpen(false)}
+      >
+        <DurationEditor
+          duration={duration}
+          handleSave={(newValue) => {
+            setDuration(newValue);
+            props.onDurationChange(newValue);
+            setOpen(false);
+          }}
+        />
+      </Popover>
+    </Box>
+  );
+}
 
 function DurationField(props: {
   duration: number;
@@ -210,7 +260,7 @@ function EditStep(props: {
         />
         {props.step.duration !== undefined && (
           <>
-            <DurationField
+            <NewDurationField
               duration={props.step.duration}
               onDurationChange={handleDurationChange}
             />
