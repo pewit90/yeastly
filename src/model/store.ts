@@ -5,6 +5,61 @@ import bread3JSON from "../testing/input/bread3.json";
 import { Bread } from "./bread";
 import { Step } from "./step";
 
+export abstract class AbstractStorage<T, ID extends number | string> {
+  private index: Record<ID, T> = {} as Record<ID, T>;
+
+  constructor(private readonly name: string) {}
+
+  get uuidStorageLocation(): string {
+    return `${this.name}_uuids`;
+  }
+
+  private fetchUuids(): ID[] {
+    return JSON.parse(localStorage.getItem(this.uuidStorageLocation) ?? "[]");
+  }
+
+  private objectStorageLocation(uuid: ID): string {
+    return `${this.name}_${uuid}`;
+  }
+
+  private fetchObject(uuid: ID): T | null {
+    const serializedObject = localStorage.getItem(
+      this.objectStorageLocation(uuid)
+    );
+    return serializedObject ? this.deserialize(serializedObject) : null;
+  }
+
+  private fetchObjects(): T[] {
+    const ids = this.fetchUuids();
+    return ids
+      .map((id) => this.fetchObject(id))
+      .filter((object) => object !== null) as T[];
+  }
+
+  private buildIndex(objects: T[]) {
+    return objects.reduce(
+      (acc, current) => ({ ...acc, [this.idOf(current)]: current }),
+      {} as Record<ID, T>
+    );
+  }
+
+  storeObject(val: T): void {
+    const id = this.idOf(val);
+    const serialized = this.serialize(val);
+    localStorage.setItem(this.objectStorageLocation(id), serialized);
+    const uuids = this.fetchUuids();
+    if (!uuids.includes(id)) {
+      uuids.push(id);
+      localStorage.setItem(this.uuidStorageLocation, JSON.stringify(uuids));
+    }
+  }
+
+  protected abstract serialize(val: T): string;
+  protected abstract deserialize(str: string): T;
+  protected abstract initialValues(): T[];
+  protected abstract idOf(val: T): ID;
+}
+
 const BREAD_UUIDS = "bread_uuids";
 
 function readStorage(): Bread[] {
