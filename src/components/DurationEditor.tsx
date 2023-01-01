@@ -57,7 +57,7 @@ function DurationEditorButton(props: {
   );
 }
 
-function getGridRow(props: {
+function GridRow(props: {
   rowID: string;
   items: { value: string; operation: (input: string) => void }[];
 }) {
@@ -78,27 +78,29 @@ function getGridRow(props: {
       </Grid>
     );
   });
-  return row;
+
+  return <>{row}</>;
 }
 
-function getNumberGridRow(props: {
+function NumberGridRow(props: {
   rowID: string;
-  range: { start: number; end: number };
+  range: [number, number];
   operation: (input: string) => void;
 }) {
-  const start = props.range.start;
-  const end = props.range.end;
+  const [start, end] = props.range;
   const values = [];
   for (var i = start; i <= end; i++) {
     values.push(i);
   }
-  const gridRow = getGridRow({
-    rowID: props.rowID,
-    items: values.map((value) => {
-      return { value: value.toString(), operation: props.operation };
-    }),
-  });
-  return gridRow;
+  return (
+    <GridRow
+      rowID={props.rowID}
+      items={values.map((value) => ({
+        value: value.toString(),
+        operation: props.operation,
+      }))}
+    />
+  );
 }
 
 export function DurationEditor(props: {
@@ -132,30 +134,18 @@ export function DurationEditor(props: {
         columnSpacing={1}
         columns={3}
       >
-        {getNumberGridRow({
-          rowID: "1",
-          range: { start: 1, end: 3 },
-          operation: rollingConcat,
-        })}
-        {getNumberGridRow({
-          rowID: "2",
-          range: { start: 4, end: 6 },
-          operation: rollingConcat,
-        })}
-        {getNumberGridRow({
-          rowID: "3",
-          range: { start: 7, end: 9 },
-          operation: rollingConcat,
-        })}
+        <NumberGridRow rowID="1" range={[1, 3]} operation={rollingConcat} />
+        <NumberGridRow rowID="2" range={[4, 6]} operation={rollingConcat} />
+        <NumberGridRow rowID="3" range={[7, 9]} operation={rollingConcat} />
         {/* Special Buttons */}
-        {getGridRow({
-          rowID: "4",
-          items: [
+        <GridRow
+          rowID="4"
+          items={[
             { value: "00", operation: rollingConcat },
             { value: "0", operation: rollingConcat },
             { value: ">>", operation: shiftRight },
-          ],
-        })}
+          ]}
+        />
         {/* Save/Clear */}
         <Grid xs={1}>
           <Box
@@ -165,7 +155,7 @@ export function DurationEditor(props: {
               alignItems: "center",
             }}
           >
-            <IconButton aria-label="save" onClick={() => clear()}>
+            <IconButton aria-label="clear" onClick={() => clear()}>
               <CancelIcon sx={{ fontSize: "30px" }} color="secondary" />
             </IconButton>
           </Box>

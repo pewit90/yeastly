@@ -28,7 +28,7 @@ import { DurationEditor } from "./DurationEditor";
 
 const leftProgressStepperWidth = "0.5rem";
 
-function NewDurationField(props: {
+function DurationField(props: {
   duration: number;
   onDurationChange: Function;
 }) {
@@ -183,7 +183,7 @@ function EditStep(props: {
         />
         {props.step.duration !== undefined && (
           <>
-            <NewDurationField
+            <DurationField
               duration={props.step.duration}
               onDurationChange={handleDurationChange}
             />
