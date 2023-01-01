@@ -8,8 +8,8 @@ import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import {
   Box,
   Checkbox,
+  Dialog,
   IconButton,
-  Popover,
   TextField,
   Typography,
 } from "@mui/material";
@@ -30,6 +30,7 @@ const leftProgressStepperWidth = "0.5rem";
 
 function DurationField(props: {
   duration: number;
+  subtitle: string;
   onDurationChange: Function;
 }) {
   const [duration, setDuration] = useState(props.duration);
@@ -50,13 +51,7 @@ function DurationField(props: {
       <IconButton ref={editIconRef} onClick={() => setOpen(true)}>
         <EditIcon />
       </IconButton>
-      <Popover
-        id="duration-popover"
-        open={open}
-        anchorEl={editIconRef.current}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        onClose={() => setOpen(false)}
-      >
+      <Dialog open={open} onClose={() => setOpen(false)}>
         <DurationEditor
           initialDuration={duration}
           handleSave={(newValue) => {
@@ -65,7 +60,10 @@ function DurationField(props: {
             setOpen(false);
           }}
         />
-      </Popover>
+        <Typography variant="caption" textAlign="right" mr="0.5rem">
+          {props.subtitle}
+        </Typography>
+      </Dialog>
     </Box>
   );
 }
@@ -186,6 +184,7 @@ function EditStep(props: {
           <>
             <DurationField
               duration={props.step.duration}
+              subtitle={props.step.name}
               onDurationChange={handleDurationChange}
             />
           </>

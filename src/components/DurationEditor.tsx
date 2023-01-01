@@ -1,14 +1,13 @@
+import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Button, IconButton, Typography } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { Box } from "@mui/system";
 import { minutesToHours } from "date-fns";
 import { useState } from "react";
-import CancelIcon from "@mui/icons-material/Cancel";
 
 function TimeInterval(props: { unit: string; value: string }) {
   return (
-    <Typography sx={{ mx: "0.6rem" }}>
+    <Typography variant="h5" sx={{ mx: "0.6rem" }}>
       {props.value + " " + props.unit}
     </Typography>
   );
@@ -150,7 +149,10 @@ export function DurationEditor(props: {
           }}
         >
           <IconButton aria-label="clear" onClick={() => clear()}>
-            <CancelIcon sx={{ fontSize: "30px" }} color="secondary" />
+            <CancelIcon
+              sx={{ fontSize: "40px", mt: "0.5rem" }}
+              color="secondary"
+            />
           </IconButton>
         </Box>
         <Box />
@@ -167,7 +169,10 @@ export function DurationEditor(props: {
               props.handleSave(localDurationToMinutes(localDuration))
             }
           >
-            <CheckCircleIcon sx={{ fontSize: "30px" }} color="secondary" />
+            <CheckCircleIcon
+              sx={{ fontSize: "40px", mt: "0.5rem" }}
+              color="secondary"
+            />
           </IconButton>
         </Box>
       </Box>
