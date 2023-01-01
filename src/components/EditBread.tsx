@@ -44,7 +44,7 @@ function DurationField(props: {
         justifyContent: "flex-end",
       }}
     >
-      <Typography>
+      <Typography alignSelf="center">
         {formatDuration(minutesToDuration(props.duration))}
       </Typography>
       <IconButton ref={editIconRef} onClick={() => setOpen(true)}>
@@ -54,6 +54,7 @@ function DurationField(props: {
         id="duration-popover"
         open={open}
         anchorEl={editIconRef.current}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         onClose={() => setOpen(false)}
       >
         <DurationEditor

@@ -21,7 +21,7 @@ function Display(props: { localDuration: string }) {
       display={"flex"}
       width={"100%"}
       justifyContent={"center"}
-      sx={{ my: "0.5rem" }}
+      sx={{ mb: "1rem" }}
     >
       <TimeInterval unit="d" value={localDuration.slice(0, 2)} />
       <TimeInterval unit="h" value={localDuration.slice(2, 4)} />
@@ -65,17 +65,11 @@ function GridRow(props: {
     const value = item.value;
     const operation = item.operation;
     return (
-      <Grid
-        xs={1}
+      <DurationEditorButton
         key={`${props.rowID}_${index}`}
-        display="flex"
-        justifyContent={"center"}
-      >
-        <DurationEditorButton
-          title={value}
-          handleClick={() => operation(value)}
-        />
-      </Grid>
+        title={value}
+        handleClick={() => operation(value)}
+      />
     );
   });
 
@@ -124,16 +118,17 @@ export function DurationEditor(props: {
     setLocalDuration(localDurationDefault);
   };
   return (
-    <Box display="flex" flexDirection={"column"}>
+    <Box display="flex" flexDirection={"column"} padding="1rem">
       <Display localDuration={localDuration} />
-      {/* Number buttons */}
-      <Grid
-        container
-        display={"flex"}
-        rowSpacing={0.5}
-        columnSpacing={1}
-        columns={3}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          columnGap: "1.5rem",
+          rowGap: "1rem",
+        }}
       >
+        {/* Number buttons */}
         <NumberGridRow rowID="1" range={[1, 3]} operation={rollingConcat} />
         <NumberGridRow rowID="2" range={[4, 6]} operation={rollingConcat} />
         <NumberGridRow rowID="3" range={[7, 9]} operation={rollingConcat} />
@@ -147,39 +142,35 @@ export function DurationEditor(props: {
           ]}
         />
         {/* Save/Clear */}
-        <Grid xs={1}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <IconButton aria-label="clear" onClick={() => clear()}>
+            <CancelIcon sx={{ fontSize: "30px" }} color="secondary" />
+          </IconButton>
+        </Box>
+        <Box />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <IconButton
+            aria-label="save"
+            onClick={() =>
+              props.handleSave(localDurationToMinutes(localDuration))
+            }
           >
-            <IconButton aria-label="clear" onClick={() => clear()}>
-              <CancelIcon sx={{ fontSize: "30px" }} color="secondary" />
-            </IconButton>
-          </Box>
-        </Grid>
-        <Grid xs={1}></Grid>
-        <Grid xs={1}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <IconButton
-              aria-label="save"
-              onClick={() =>
-                props.handleSave(localDurationToMinutes(localDuration))
-              }
-            >
-              <CheckCircleIcon sx={{ fontSize: "30px" }} color="secondary" />
-            </IconButton>
-          </Box>
-        </Grid>
-      </Grid>
+            <CheckCircleIcon sx={{ fontSize: "30px" }} color="secondary" />
+          </IconButton>
+        </Box>
+      </Box>
     </Box>
   );
 }
