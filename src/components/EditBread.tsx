@@ -2,39 +2,40 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import EditIcon from "@mui/icons-material/Edit";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import { Box, Checkbox, IconButton, TextField } from "@mui/material";
-import Input from "@mui/material/Input";
-import InputAdornment from "@mui/material/InputAdornment";
+import {
+  Box,
+  Checkbox,
+  Dialog,
+  IconButton,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Stack } from "@mui/system";
-import { Duration } from "date-fns";
+import { formatDuration } from "date-fns";
 import { produce } from "immer";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step } from "../model/step";
 import { getBread, storeBread } from "../model/store";
-import {
-  durationToMinutes,
-  minutesToDuration,
-} from "../utils/conversion-utils";
+import { minutesToDuration } from "../utils/conversion-utils";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
+import { DurationEditor } from "./DurationEditor";
 
 const leftProgressStepperWidth = "0.5rem";
 
 function DurationField(props: {
   duration: number;
+  subtitle: string;
   onDurationChange: Function;
 }) {
-  const [duration, setDuration] = useState(minutesToDuration(props.duration));
-  const handleChange = (newDuration: Duration) => {
-    setDuration(newDuration);
-    const minutes = durationToMinutes(newDuration);
-    props.onDurationChange(minutes); // duration as number
-  };
-  const inputStyling = { width: "25%", ml: "1rem" };
+  const [duration, setDuration] = useState(props.duration);
+  const editIconRef = useRef(null);
+  const [open, setOpen] = useState(false);
   return (
     <Box
       sx={{
@@ -44,54 +45,25 @@ function DurationField(props: {
         justifyContent: "flex-end",
       }}
     >
-      <Input
-        error={duration.days !== undefined && duration.days < 0}
-        value={duration.days}
-        sx={{ ...inputStyling, ml: 0 }}
-        type="number"
-        onChange={(e) => {
-          const newDuration: Duration = {
-            ...duration,
-            days: +e.target.value,
-          };
-          handleChange(newDuration);
-        }}
-        endAdornment={<InputAdornment position="end">d</InputAdornment>}
-      />
-      <Input
-        error={
-          duration.hours !== undefined &&
-          (duration.hours < 0 || duration.hours >= 24)
-        }
-        value={duration.hours}
-        sx={inputStyling}
-        type="number"
-        onChange={(e) => {
-          const newDuration: Duration = {
-            ...duration,
-            hours: +e.target.value,
-          };
-          handleChange(newDuration);
-        }}
-        endAdornment={<InputAdornment position="end">h</InputAdornment>}
-      />
-      <Input
-        error={
-          duration.minutes !== undefined &&
-          (duration.minutes < 0 || duration.minutes >= 60)
-        }
-        value={duration.minutes}
-        sx={inputStyling}
-        type="number"
-        onChange={(e) => {
-          const newDuration: Duration = {
-            ...duration,
-            minutes: +e.target.value,
-          };
-          handleChange(newDuration);
-        }}
-        endAdornment={<InputAdornment position="end">m</InputAdornment>}
-      />
+      <Typography alignSelf="center">
+        {formatDuration(minutesToDuration(props.duration))}
+      </Typography>
+      <IconButton ref={editIconRef} onClick={() => setOpen(true)}>
+        <EditIcon />
+      </IconButton>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DurationEditor
+          initialDuration={duration}
+          handleSave={(newValue) => {
+            setDuration(newValue);
+            props.onDurationChange(newValue);
+            setOpen(false);
+          }}
+        />
+        <Typography variant="caption" textAlign="right" mr="0.5rem">
+          {props.subtitle}
+        </Typography>
+      </Dialog>
     </Box>
   );
 }
@@ -212,6 +184,7 @@ function EditStep(props: {
           <>
             <DurationField
               duration={props.step.duration}
+              subtitle={props.step.name}
               onDurationChange={handleDurationChange}
             />
           </>
