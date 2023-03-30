@@ -1,12 +1,12 @@
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import {
   Box,
+  Button,
   Checkbox,
   Dialog,
   IconButton,
@@ -20,7 +20,7 @@ import React, { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
 import { Step } from "../model/step";
-import { getBread, storeBread } from "../model/store";
+import { createAndStoreBread, getBread, storeBread } from "../model/store";
 import { minutesToDuration } from "../utils/conversion-utils";
 import { Page } from "./common/Page";
 import { ProgressStepperElement } from "./common/ProgressStepperElement";
@@ -339,16 +339,40 @@ export function EditBread() {
             alignItems: "end",
           }}
         >
-          <IconButton
-            edge="start"
+          {uuid && (
+            <Button
+              sx={{ my: "0.5rem" }}
+              aria-label="CreateCopy"
+              variant="contained"
+              onClick={() => {
+                createAndStoreBread(
+                  bread.name,
+                  bread.steps.map((step) =>
+                    produce(step, (draft) => {
+                      draft.startedAt = undefined;
+                      draft.completedAt = undefined;
+                      return draft;
+                    })
+                  )
+                );
+                // TODO: Navigate properly
+                // navigate(-1);
+              }}
+            >
+              Save as copy
+            </Button>
+          )}
+          <Button
+            sx={{ my: "0.5rem" }}
             aria-label="Create"
+            variant="contained"
             onClick={() => {
               storeBread(bread);
               navigate(-1);
             }}
           >
-            <CheckCircleIcon sx={{ fontSize: "48px" }} color="secondary" />
-          </IconButton>
+            Save
+          </Button>
         </Box>
       </Stack>
     </Page>
