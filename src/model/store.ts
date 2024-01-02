@@ -93,5 +93,14 @@ export function createAndStoreBread(name?: string, steps?: Step[]) {
     timestamp
   );
   storeBread(bread);
-  return bread;
+}
+
+export function cloneAndStoreBread(original: Bread) {
+  const timestamp = new Date();
+  const bread = original.cloneAndReset(
+    timestamp.getTime(),
+    timestamp,
+    `${original.name} (copy)`
+  );
+  storeBread(bread);
 }

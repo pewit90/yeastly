@@ -255,8 +255,11 @@ export function BreadView() {
   const handleContinue = () => {
     updateBread((bread) => bread.continue());
   };
-  const handleReset = () => {
-    updateBread((bread) => bread.reset());
+  const handleResetCurrentStep = () => {
+    updateBread((bread) => bread.resetCurrentStep());
+  };
+  const handleResetAllSteps = () => {
+    updateBread((bread) => bread.resetAllSteps());
   };
   const handleResumePrevious = () => {
     updateBread((bread) => bread.resumePreviousStep());
@@ -281,21 +284,56 @@ export function BreadView() {
             isLast={index === bread.steps.length - 1}
             onStart={handleStartStep}
             onContinue={handleContinue}
-            onReset={handleReset}
+            onReset={handleResetCurrentStep}
             onResumePrevious={handleResumePrevious}
           />
         ))}
       </Box>
-      <Fab
-        color="secondary"
-        aria-label="edit"
+      <BreadMenu
+        onEdit={() => navigate("/edit/" + uuid)}
+        onResetSteps={handleResetAllSteps}
+      />
+    </Page>
+  );
+}
+
+function BreadMenu(props: { onEdit: () => void; onResetSteps: () => void }) {
+  const iconRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const handleClose = (fnc: () => void) => () => {
+    setOpen(false);
+    fnc();
+  };
+  return (
+    <>
+      <Box
+        ref={iconRef}
+        onClick={() => setOpen(true)}
         sx={{ position: "fixed", bottom: "2rem", right: "2rem" }}
-        onClick={() => {
-          navigate("/edit/" + uuid);
+      >
+        <Fab color="secondary" aria-label="edit">
+          <MoreVertIcon />
+        </Fab>
+      </Box>
+      <Menu
+        id="basic-menu"
+        anchorEl={iconRef.current}
+        open={open}
+        onClose={() => setOpen(false)}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
         }}
       >
-        <ModeEditIcon />
-      </Fab>
-    </Page>
+        <MenuItem onClick={handleClose(props.onEdit)}>Edit</MenuItem>
+        <MenuItem onClick={handleClose(props.onResetSteps)}>
+          Reset Steps
+        </MenuItem>
+      </Menu>
+    </>
   );
 }
