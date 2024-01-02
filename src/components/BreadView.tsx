@@ -1,5 +1,4 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
@@ -7,7 +6,7 @@ import Fab from "@mui/material/Fab";
 import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bread } from "../model/bread";
-import { formatDuration, Step, stepDuration, StepState } from "../model/step";
+import { Step, StepState, formatDuration, stepDuration } from "../model/step";
 import { getBread, storeBread } from "../model/store";
 import { DurationView } from "./common/DurationView";
 import { Page } from "./common/Page";
