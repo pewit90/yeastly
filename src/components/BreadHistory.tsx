@@ -1,5 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import {
   Fab,
   IconButton,
@@ -11,7 +12,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bread } from "../model/bread";
-import { deleteBread, getBreads } from "../model/store";
+import { cloneAndStoreBread, deleteBread, getBreads } from "../model/store";
 import { Page } from "./common/Page";
 import { TimersView } from "./TimersView";
 
@@ -20,16 +21,28 @@ function BreadListItem(props: { bread: Bread; onChange: Function }) {
   return (
     <ListItem
       secondaryAction={
-        <IconButton
-          edge="end"
-          aria-label="delete"
-          onClick={() => {
-            deleteBread(props.bread.uuid);
-            props.onChange();
-          }}
-        >
-          <DeleteIcon />
-        </IconButton>
+        <>
+          <IconButton
+            edge="end"
+            aria-label="copy"
+            onClick={() => {
+              cloneAndStoreBread(props.bread);
+              props.onChange();
+            }}
+          >
+            <ContentCopyIcon />
+          </IconButton>
+          <IconButton
+            edge="end"
+            aria-label="delete"
+            onClick={() => {
+              deleteBread(props.bread.uuid);
+              props.onChange();
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </>
       }
     >
       <ListItemText

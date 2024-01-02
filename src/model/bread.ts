@@ -69,7 +69,7 @@ export class Bread {
     });
   }
 
-  reset(): Bread {
+  resetCurrentStep(): Bread {
     return produce(this, (nextBread) => {
       const currentStepIndex = nextBread.currentStepIndex;
       const currentStep = nextBread.steps[currentStepIndex];
@@ -103,5 +103,24 @@ export class Bread {
         currentStep.startedAt = startedAt;
       }
     });
+  }
+
+  resetAllSteps(): Bread {
+    return produce(this, (nextBread) => {
+      nextBread.steps = this.steps.map((step) =>
+        produce(step, (nextStep) => {
+          nextStep.startedAt = undefined;
+          nextStep.completedAt = undefined;
+        })
+      );
+    });
+  }
+
+  cloneAndReset(uuid: number, createdTimestamp: Date, name?: string): Bread {
+    return produce(this, (nextBread) => {
+      nextBread.uuid = uuid;
+      nextBread.createdTimestamp = createdTimestamp;
+      nextBread.name = name ?? this.name;
+    }).resetAllSteps();
   }
 }
